@@ -57,22 +57,38 @@ def book_appointment(date, time, student_name, course_name):
     except Exception as e:
         return f"Error: {str(e)}"
 
+import re
+
 def get_local_response(query):
     """
     Fast local lookup for common questions with refined matching.
     """
     query_clean = query.lower().strip()
     
-    # 1. Search for courses (Improved matching)
+    # 0. Logic/Meta Inquiry Handler
+    logic_keywords = ["logic", "how do you", "why did you", "how it works", "recommending based on"]
+    if any(k in query_clean for k in logic_keywords):
+        return ("My recommendation logic is based on matching your expressed interests (e.g., 'coding', 'business', 'science') "
+                "directly with the core curriculum and career outcomes of Chandigarh University's programs. "
+                "I look for specific keywords in your messages to suggest the most relevant academic paths.")
+
+    # 1. Search for courses (Improved matching with word boundaries)
     course_keywords = ["course", "degree", "study", "program", "admission", "department"]
-    if any(k in query_clean for k in course_keywords) or any(c["name"].lower() in query_clean for c in COURSES):
+    
+    # Check if any course keyword exists as a whole word
+    has_course_context = any(re.search(rf"\b{re.escape(k)}\b", query_clean) for k in course_keywords)
+    
+    if has_course_context or any(re.search(rf"\b{re.escape(c['name'].lower())}\b", query_clean) for c in COURSES):
         matched_courses = []
         for course in COURSES:
             course_name = course["name"].lower()
             course_interests = [i.lower() for i in course.get("interests", [])]
             
-            # Match by name, interest, or specific keywords in query
-            if course_name in query_clean or any(interest in query_clean for interest in course_interests):
+            # Match by name or interest (whole words only)
+            name_match = re.search(rf"\b{re.escape(course_name)}\b", query_clean)
+            interest_match = any(re.search(rf"\b{re.escape(interest)}\b", query_clean) for interest in course_interests)
+            
+            if name_match or interest_match:
                 matched_courses.append(course)
         
         if matched_courses:
@@ -86,12 +102,12 @@ def get_local_response(query):
     policy_keywords = ["policy", "rule", "attendance", "appointment", "schedule", "timing", "admission"]
     for policy in POLICIES:
         topic = policy["topic"].lower()
-        if topic in query_clean or (any(k in query_clean for k in policy_keywords) and topic.split()[0] in query_clean):
+        if re.search(rf"\b{re.escape(topic)}\b", query_clean) or (any(re.search(rf"\b{re.escape(k)}\b", query_clean) for k in policy_keywords) and topic.split()[0] in query_clean):
             return f"According to CU Policy on {policy['topic']}: {policy['description']}"
 
     # 3. Direct Greeting/Identity
     greetings = ["hi", "hello", "hey", "who are you", "what can you do"]
-    if any(query_clean == g for g in greetings) or "help" in query_clean and len(query_clean) < 10:
+    if any(query_clean == g for g in greetings) or (re.search(rf"\bhelp\b", query_clean) and len(query_clean) < 10):
         return "Hello! I am your CU Academic Advisor. I can help you with course information, university policies, and booking appointments. How can I assist you today?"
 
     return None
@@ -104,8 +120,9 @@ Courses: {json.dumps(COURSES)}
 Policies: {json.dumps(POLICIES)}
 
 GUIDELINES:
-1. Be polite and professional.
-2. Suggest courses from the KNOWLEDGE BASE based on interests.
-3. Offer to book an appointment (9 AM - 5 PM, Mon-Fri) if they confirm interest.
+1. Be polite and professional. Always prioritize answering the user's specific inquiry directly before providing general recommendations.
+2. If the user asks about your logic, identity, or how you operate, explain that you are an AI advisor designed to match student interests with CU's academic offerings.
+3. Suggest courses from the KNOWLEDGE BASE only when they align with the student's expressed interests or when the user asks for options.
+4. Offer to book an academic advising appointment (9 AM - 5 PM, Mon-Fri) if the student shows interest in specific programs or needs professional guidance.
 """
 
