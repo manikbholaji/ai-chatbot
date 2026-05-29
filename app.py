@@ -239,8 +239,10 @@ if st.session_state.page == "Student Advisor":
                     st.session_state.last_req_id = str(uuid.uuid4())
                     st.rerun()
                 elif result.get('status') == 'error':
-                    st.error(f"Error: {result.get('error')}")
+                    st.error("I'm having trouble connecting to my brain right now. Please try again or ask about courses/policies which I can answer instantly!")
                     st.session_state.processing = False
+                    if st.button("Retry"):
+                        st.rerun()
 
     # Input Logic
     if not st.session_state.processing:

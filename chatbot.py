@@ -59,36 +59,40 @@ def book_appointment(date, time, student_name, course_name):
 
 def get_local_response(query):
     """
-    Fast local lookup for common questions with strict intent matching.
+    Fast local lookup for common questions with refined matching.
     """
     query_clean = query.lower().strip()
     
-    # 1. Search for courses (Broad Keyword Match)
-    academic_keywords = ["course", "degree", "engineering", "coding", "software", "study", "bachelor", "master", "mca", "mba"]
-    if any(keyword in query_clean for keyword in academic_keywords):
+    # 1. Search for courses (Improved matching)
+    course_keywords = ["course", "degree", "study", "program", "admission", "department"]
+    if any(k in query_clean for k in course_keywords) or any(c["name"].lower() in query_clean for c in COURSES):
         matched_courses = []
         for course in COURSES:
-            # Check for name match or interest match
             course_name = course["name"].lower()
             course_interests = [i.lower() for i in course.get("interests", [])]
             
-            if any(word in query_clean for word in course_name.split()) or \
-               any(interest in query_clean for interest in course_interests):
+            # Match by name, interest, or specific keywords in query
+            if course_name in query_clean or any(interest in query_clean for interest in course_interests):
                 matched_courses.append(course)
         
         if matched_courses:
             response = "Based on your interests, I recommend the following courses at Chandigarh University:\n\n"
             for c in matched_courses:
                 response += f"- **{c['name']}**: {c['description']} (Duration: {c['duration']})\n"
-            response += "\nWould you like me to book an academic advising appointment for any of these?"
+            response += "\nWould you like me to book an academic advising appointment to discuss these further?"
             return response
 
-    # 2. Search for policies (Strict Intent)
-    policy_keywords = ["policy", "attendance", "admission", "appointment", "rule"]
-    if any(keyword in query_clean for keyword in policy_keywords):
-        for policy in POLICIES:
-            if policy["topic"].lower() in query_clean:
-                return f"According to CU Policy on {policy['topic']}: {policy['description']}"
+    # 2. Search for policies (Improved matching)
+    policy_keywords = ["policy", "rule", "attendance", "appointment", "schedule", "timing", "admission"]
+    for policy in POLICIES:
+        topic = policy["topic"].lower()
+        if topic in query_clean or (any(k in query_clean for k in policy_keywords) and topic.split()[0] in query_clean):
+            return f"According to CU Policy on {policy['topic']}: {policy['description']}"
+
+    # 3. Direct Greeting/Identity
+    greetings = ["hi", "hello", "hey", "who are you", "what can you do"]
+    if any(query_clean == g for g in greetings) or "help" in query_clean and len(query_clean) < 10:
+        return "Hello! I am your CU Academic Advisor. I can help you with course information, university policies, and booking appointments. How can I assist you today?"
 
     return None
 
