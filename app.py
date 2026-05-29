@@ -100,8 +100,9 @@ def register_user(username, password):
 def authenticate(username, password):
     users = load_users()
     pw_hash = hashlib.sha256(password.encode()).hexdigest()
-    if username in users and users[username]["password"] == pw_hash:
-        return True, users[username]["role"]
+    user_data = users.get(username)
+    if user_data and user_data.get("password") == pw_hash:
+        return True, user_data.get("role", "student")
     return False, None
 
 # --- SIDEBAR: AUTH & NAVIGATION ---

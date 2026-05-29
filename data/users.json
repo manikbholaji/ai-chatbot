@@ -1,8 +1,10 @@
 {
     "admin": {
-        "password": "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918"
+        "password": "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918",
+        "role": "admin"
     },
     "Manik": {
-        "password": "4fdab10ca0a447b62918380d73dbcca040c6cd3fad32461e7a57f01ef62a9778"
+        "password": "4fdab10ca0a447b62918380d73dbcca040c6cd3fad32461e7a57f01ef62a9778",
+        "role": "student"
     }
 }
