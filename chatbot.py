@@ -66,8 +66,8 @@ def get_local_response(query):
     query_clean = query.lower().strip()
     
     # 0. Logic/Meta Inquiry Handler
-    logic_keywords = ["logic", "how do you", "why did you", "how it works", "recommending based on"]
-    if any(k in query_clean for k in logic_keywords):
+    logic_keywords = ["logic", "how do you", "why did you", "how it works", "recommending", "recommend"]
+    if any(re.search(rf"\b{re.escape(k)}\b", query_clean) for k in logic_keywords):
         return ("My recommendation logic is based on matching your expressed interests (e.g., 'coding', 'business', 'science') "
                 "directly with the core curriculum and career outcomes of Chandigarh University's programs. "
                 "I look for specific keywords in your messages to suggest the most relevant academic paths.")
