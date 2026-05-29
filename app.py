@@ -200,18 +200,38 @@ if st.session_state.page == "Student Advisor":
         
         with faq_col1:
             if st.button("📚 What courses are offered?", use_container_width=True):
-                st.session_state.messages.append({"role": "user", "content": "What courses are offered at Chandigarh University?"})
+                prompt = "What courses are offered at Chandigarh University?"
+                st.session_state.messages.append({"role": "user", "content": prompt})
+                local = get_local_response(prompt)
+                if local:
+                    st.session_state.messages.append({"role": "assistant", "content": local})
+                    log_interaction(prompt, local, TextBlob(prompt).sentiment.polarity, "FAQ-QuickAction")
                 st.rerun()
             if st.button("🗓️ How do I book an appointment?", use_container_width=True):
-                st.session_state.messages.append({"role": "user", "content": "How do I book an academic advising appointment?"})
+                prompt = "How do I book an academic advising appointment?"
+                st.session_state.messages.append({"role": "user", "content": prompt})
+                local = get_local_response(prompt)
+                if local:
+                    st.session_state.messages.append({"role": "assistant", "content": local})
+                    log_interaction(prompt, local, TextBlob(prompt).sentiment.polarity, "FAQ-QuickAction")
                 st.rerun()
         
         with faq_col2:
             if st.button("⚖️ What is the attendance policy?", use_container_width=True):
-                st.session_state.messages.append({"role": "user", "content": "Tell me about the university attendance policy."})
+                prompt = "Tell me about the university attendance policy."
+                st.session_state.messages.append({"role": "user", "content": prompt})
+                local = get_local_response(prompt)
+                if local:
+                    st.session_state.messages.append({"role": "assistant", "content": local})
+                    log_interaction(prompt, local, TextBlob(prompt).sentiment.polarity, "FAQ-QuickAction")
                 st.rerun()
             if st.button("🤔 How do you recommend courses?", use_container_width=True):
-                st.session_state.messages.append({"role": "user", "content": "What is your logic behind recommending courses?"})
+                prompt = "What is your logic behind recommending courses?"
+                st.session_state.messages.append({"role": "user", "content": prompt})
+                local = get_local_response(prompt)
+                if local:
+                    st.session_state.messages.append({"role": "assistant", "content": local})
+                    log_interaction(prompt, local, TextBlob(prompt).sentiment.polarity, "FAQ-QuickAction")
                 st.rerun()
         
         st.divider()
