@@ -75,8 +75,8 @@ def get_local_response(query):
     # 1. Search for courses (Improved matching with word boundaries)
     course_keywords = ["course", "degree", "study", "program", "admission", "department"]
     
-    # Check if any course keyword exists as a whole word
-    has_course_context = any(re.search(rf"\b{re.escape(k)}\b", query_clean) for k in course_keywords)
+    # Check if any course keyword exists as a whole word (handling potential plural)
+    has_course_context = any(re.search(rf"\b{re.escape(k)}s?\b", query_clean) for k in course_keywords)
     
     if has_course_context or any(re.search(rf"\b{re.escape(c['name'].lower())}\b", query_clean) for c in COURSES):
         matched_courses = []
@@ -91,6 +91,10 @@ def get_local_response(query):
             if name_match or interest_match:
                 matched_courses.append(course)
         
+        # If no specific course interest matched but "courses" was asked, show all
+        if not matched_courses and has_course_context:
+            matched_courses = COURSES
+            
         if matched_courses:
             response = "Based on your interests, I recommend the following courses at Chandigarh University:\n\n"
             for c in matched_courses:
@@ -102,7 +106,13 @@ def get_local_response(query):
     policy_keywords = ["policy", "rule", "attendance", "appointment", "schedule", "timing", "admission"]
     for policy in POLICIES:
         topic = policy["topic"].lower()
-        if re.search(rf"\b{re.escape(topic)}\b", query_clean) or (any(re.search(rf"\b{re.escape(k)}\b", query_clean) for k in policy_keywords) and topic.split()[0] in query_clean):
+        # Handle optional pluralization in topic for better matching (e.g. Appointment -> Appointments)
+        topic_pattern = rf"\b{re.escape(topic.rstrip('s'))}s?\b"
+        
+        # More flexible policy matching: topic keyword or policy keyword + topic word
+        if re.search(topic_pattern, query_clean) or \
+           (any(re.search(rf"\b{re.escape(k)}\b", query_clean) for k in policy_keywords) and \
+            any(re.search(rf"\b{re.escape(word.rstrip('s'))}s?\b", query_clean) for word in topic.split())):
             return f"According to CU Policy on {policy['topic']}: {policy['description']}"
 
     # 3. Direct Greeting/Identity
