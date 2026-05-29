@@ -266,7 +266,7 @@ elif st.session_state.page == "Chat History":
     st.title("📜 Conversation Logs")
     
     if not st.session_state.authenticated:
-        st.warning("💡 Sign in via sidebar to access persistent history.")
+        st.warning("💡 Sign in via sidebar to access your persistent, professionally organized history.")
         if st.session_state.messages:
             st.subheader("Current Session")
             for msg in st.session_state.messages:
