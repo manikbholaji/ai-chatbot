@@ -1,0 +1,16 @@
+{
+  "policies": [
+    {
+      "topic": "Admission",
+      "description": "Admissions are based on merit and entrance exams like CUCET."
+    },
+    {
+      "topic": "Attendance",
+      "description": "Minimum 75% attendance is required to be eligible for final examinations."
+    },
+    {
+      "topic": "Appointments",
+      "description": "Student advisor appointments are available Monday to Friday, 9:00 AM to 5:00 PM."
+    }
+  ]
+}

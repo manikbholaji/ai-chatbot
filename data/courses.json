@@ -1,0 +1,44 @@
+{
+  "courses": [
+    {
+      "id": "BE-CSE",
+      "name": "Bachelor of Engineering in Computer Science",
+      "department": "Engineering",
+      "description": "A comprehensive program covering software development, AI, data science, and networking.",
+      "interests": ["coding", "software", "AI", "computers", "math"],
+      "duration": "4 years"
+    },
+    {
+      "id": "BE-ME",
+      "name": "Bachelor of Engineering in Mechanical Engineering",
+      "department": "Engineering",
+      "description": "Focuses on design, analysis, manufacturing, and maintenance of mechanical systems.",
+      "interests": ["machines", "design", "physics", "automotive", "robotics"],
+      "duration": "4 years"
+    },
+    {
+      "id": "MBA",
+      "name": "Master of Business Administration",
+      "department": "Management",
+      "description": "Advanced study in business management, marketing, finance, and human resources.",
+      "interests": ["business", "management", "leadership", "finance", "marketing"],
+      "duration": "2 years"
+    },
+    {
+      "id": "MCA",
+      "name": "Master of Computer Applications",
+      "department": "Computing",
+      "description": "Professional postgraduate degree in computer science and applications.",
+      "interests": ["coding", "web development", "databases", "it", "applications"],
+      "duration": "2 years"
+    },
+    {
+      "id": "BSC-BIOTECH",
+      "name": "B.Sc. in Biotechnology",
+      "department": "Sciences",
+      "description": "Study of biological systems and organisms to develop products and technologies.",
+      "interests": ["biology", "science", "research", "genetics", "health"],
+      "duration": "3 years"
+    }
+  ]
+}
