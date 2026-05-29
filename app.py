@@ -147,9 +147,8 @@ with st.sidebar:
                     if success:
                         st.session_state.authenticated = True
                         st.session_state.user = {"name": u_in, "role": role}
-                        # Restore recent history if current session is empty
-                        if not st.session_state.messages:
-                            st.session_state.messages = load_recent_history(u_in)
+                        # Start with a clean session for Student Advisor as requested
+                        st.session_state.messages = []
                         st.rerun()
                     else:
                         st.error("Invalid credentials")
@@ -192,14 +191,29 @@ ai_driver = puter_bridge(key="headless_ai_driver")
 if st.session_state.page == "Student Advisor":
     st.title("🎓 Chandigarh University Advisor")
     
-    if not st.session_state.authenticated and not st.session_state.messages:
-        st.markdown("""
-            #### Smart Academic Support 🚀
-            I help students navigate **Chandigarh University** courses, policies, and appointments.
-            - 📚 **Course Recommendations**
-            - 🗓️ **Policy Guidance**
-            - 🤖 **Unlimited AI Support** (Anonymous & Keyless)
-        """)
+    # FAQ & Quick Actions Section (Always visible at the top if no messages yet)
+    if not st.session_state.messages:
+        st.markdown("#### How can I assist you today? 🚀")
+        st.caption("Select a common query or type your own below.")
+        
+        faq_col1, faq_col2 = st.columns(2)
+        
+        with faq_col1:
+            if st.button("📚 What courses are offered?", use_container_width=True):
+                st.session_state.messages.append({"role": "user", "content": "What courses are offered at Chandigarh University?"})
+                st.rerun()
+            if st.button("🗓️ How do I book an appointment?", use_container_width=True):
+                st.session_state.messages.append({"role": "user", "content": "How do I book an academic advising appointment?"})
+                st.rerun()
+        
+        with faq_col2:
+            if st.button("⚖️ What is the attendance policy?", use_container_width=True):
+                st.session_state.messages.append({"role": "user", "content": "Tell me about the university attendance policy."})
+                st.rerun()
+            if st.button("🤔 How do you recommend courses?", use_container_width=True):
+                st.session_state.messages.append({"role": "user", "content": "What is your logic behind recommending courses?"})
+                st.rerun()
+        
         st.divider()
 
     # Chat Container
