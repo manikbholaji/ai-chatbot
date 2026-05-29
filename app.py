@@ -234,7 +234,9 @@ if st.session_state.page == "Student Advisor":
                 if result.get('status') == 'success':
                     resp = result.get('message', {}).get('content', "No response")
                     st.session_state.messages.append({"role": "assistant", "content": resp})
-                    log_interaction(st.session_state.messages[-2]["content"], resp, 0, "AI-Client")
+                    user_msg = st.session_state.messages[-2]["content"]
+                    sentiment_score = TextBlob(user_msg).sentiment.polarity
+                    log_interaction(user_msg, resp, sentiment_score, "AI-Client")
                     st.session_state.processing = False
                     st.session_state.last_req_id = str(uuid.uuid4())
                     st.rerun()
@@ -318,13 +320,26 @@ elif st.session_state.page == "Admin Dashboard":
         m1.metric("Total Queries", len(df))
         m2.metric("Avg Sentiment", round(df['sentiment'].mean(), 2))
         
-        st.subheader("Query Distribution")
-        mode_c = df['mode'].value_counts().reset_index()
-        fig = px.pie(mode_c, values='count', names='mode', hole=0.4)
+        st.subheader("Sentiment Analysis")
+        def categorize_sentiment(score):
+            if score > 0.1: return "Decisive / Satisfied (Positive)"
+            elif score < -0.1: return "Frustrated / Anxious (Negative)"
+            else: return "Uncertain / Hesitant (Neutral)"
+            
+        df['sentiment_label'] = df['sentiment'].apply(categorize_sentiment)
+        sentiment_counts = df['sentiment_label'].value_counts().reset_index()
+        
+        fig = px.pie(sentiment_counts, values='count', names='sentiment_label', hole=0.4,
+                     color='sentiment_label',
+                     color_discrete_map={
+                         "Decisive / Satisfied (Positive)": "#2ecc71",
+                         "Uncertain / Hesitant (Neutral)": "#f1c40f",
+                         "Frustrated / Anxious (Negative)": "#e74c3c"
+                     })
         st.plotly_chart(fig, use_container_width=True)
         
         st.subheader("Recent Activity")
-        st.dataframe(df[['timestamp', 'user', 'mode', 'student_message', 'bot_response']], use_container_width=True)
+        st.dataframe(df[['timestamp', 'user', 'mode', 'sentiment_label', 'student_message', 'bot_response']], use_container_width=True)
     else:
         st.info("No logs collected yet.")
 
