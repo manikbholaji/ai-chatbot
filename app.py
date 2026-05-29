@@ -67,6 +67,20 @@ def log_interaction(message, response, sentiment, mode):
     with open(log_file, "a") as f:
         f.write(json.dumps(log_entry) + "\n")
 
+def load_recent_history(username, limit=10):
+    log_f = project_path("data", "interaction_logs.jsonl")
+    if not os.path.exists(log_f): return []
+    
+    user_messages = []
+    with open(log_f, "r") as f:
+        for line in f:
+            entry = json.loads(line)
+            if entry.get("user") == username:
+                user_messages.append({"role": "user", "content": entry["student_message"]})
+                user_messages.append({"role": "assistant", "content": entry["bot_response"]})
+    
+    return user_messages[-limit:]
+
 # --- LOCAL USER DATABASE SYSTEM ---
 USERS_FILE = project_path("data", "users.json")
 
@@ -131,6 +145,9 @@ with st.sidebar:
                     if success:
                         st.session_state.authenticated = True
                         st.session_state.user = {"name": u_in, "role": role}
+                        # Restore recent history if current session is empty
+                        if not st.session_state.messages:
+                            st.session_state.messages = load_recent_history(u_in)
                         st.rerun()
                     else: st.error("Invalid credentials")
         
@@ -190,7 +207,12 @@ if st.session_state.page == "Student Advisor":
         with st.chat_message("assistant"):
             st.info("Thinking... 🧠")
             
-            history = [{"role": "system", "content": SYSTEM_PROMPT}]
+            # Construct context-aware history for professional tracking
+            sys_content = SYSTEM_PROMPT
+            if st.session_state.authenticated:
+                sys_content += f"\n\nCURRENT USER CONTEXT: You are helping {st.session_state.user['name']} ({st.session_state.user['role']})."
+            
+            history = [{"role": "system", "content": sys_content}]
             for m in st.session_state.messages:
                 history.append({"role": m["role"], "content": m["content"]})
             
