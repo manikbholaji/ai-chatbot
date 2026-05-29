@@ -282,6 +282,37 @@
         }
         return;
       }
+
+      // --- NEW: ANONYMOUS CHAT COMMAND ---
+      if (args.command === 'anonymous_chat') {
+        if (!args.request_id || args.request_id === lastRequestId) return;
+        
+        lastRequestId = args.request_id;
+        // Make the component "headless" (invisible) during this operation
+        Streamlit.setFrameHeight(1); 
+        
+        try {
+          const response = await puter.ai.chat(args.messages, {
+            model: args.model || 'gpt-4o-mini'
+          });
+          
+          Streamlit.setComponentValue({
+            type: 'ai_response',
+            status: 'success',
+            request_id: lastRequestId,
+            message: response.message
+          });
+        } catch (err) {
+          console.error("Anonymous AI Request failed", err);
+          Streamlit.setComponentValue({
+            type: 'ai_response',
+            status: 'error',
+            request_id: lastRequestId,
+            error: err.toString()
+          });
+        }
+        return;
+      }
       
       if (!puter.auth.isSignedIn()) {
         renderLogin();

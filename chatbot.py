@@ -2,21 +2,8 @@ import json
 import os
 from pathlib import Path
 from datetime import datetime
-try:
-    from openai import OpenAI
-    HAS_OPENAI = True
-except ImportError:
-    HAS_OPENAI = False
-
-try:
-    from puter.client import PuterAI
-    HAS_PUTER = True
-except ImportError:
-    HAS_PUTER = False
-
 # Load Knowledge Base
 BASE_DIR = Path(__file__).resolve().parent
-
 
 def project_path(*parts):
     return BASE_DIR.joinpath(*parts)
@@ -119,67 +106,3 @@ GUIDELINES:
 3. Offer to book an appointment (9 AM - 5 PM, Mon-Fri) if they confirm interest.
 """
 
-def get_puter_response(messages):
-    """
-    Backend AI response using Puter Python SDK with Developer Auth Token.
-    """
-    token = os.getenv("PUTER_AUTH_TOKEN")
-    if not token or not HAS_PUTER:
-        return None
-        
-    try:
-        # Use the backend driver to call Puter's AI
-        puter_ai = PuterAI(api_key=token)
-        
-        # Prepare messages for Puter (System prompt + History)
-        full_messages = [{"role": "system", "content": SYSTEM_PROMPT}] + messages
-        
-        response = puter_ai.create_completion(
-            messages=full_messages,
-            model="gpt-4o-mini"
-        )
-        
-        if isinstance(response, dict) and "message" in response:
-            return response["message"]["content"]
-        elif isinstance(response, dict) and "error" in response:
-            print(f"Puter API Error: {response['error']}")
-            return None
-        return None
-    except Exception as e:
-        print(f"Puter SDK Exception: {str(e)}")
-        return None
-
-def get_advisor_response(messages):
-    """
-    Hybrid response: Local lookup -> Puter (Backend) -> OpenAI -> Fallback
-    """
-    last_query = messages[-1]["content"]
-    
-    # 1. Try local lookup first (Instant, no prompt)
-    local_resp = get_local_response(last_query)
-    if local_resp:
-        return local_resp
-
-    # 2. Try Puter (Backend) - Developer Powered
-    if os.getenv("PUTER_AUTH_TOKEN"):
-        puter_resp = get_puter_response(messages)
-        if puter_resp:
-            return puter_resp
-
-    # 3. Try OpenAI if key is present
-    api_key = os.getenv("OPENAI_API_KEY")
-    if api_key and HAS_OPENAI:
-        try:
-            client = OpenAI(api_key=api_key)
-            # Simplified for speed
-            response = client.chat.completions.create(
-                model="gpt-4o-mini",
-                messages=[{"role": "system", "content": SYSTEM_PROMPT}] + messages,
-                max_tokens=500
-            )
-            return response.choices[0].message.content
-        except Exception as e:
-            return f"I'm having trouble connecting to my AI core ({str(e)}). However, I can still help you with course info and appointments locally!"
-
-    # 3. Smart Fallback
-    return "I'm here to help with your academic journey at Chandigarh University! Could you tell me more about your interests so I can suggest the best courses or help you book an appointment?"

@@ -1,66 +1,47 @@
-# AI chatbot
+# AI chatbot (MCA Final Project)
 
-An AI-powered academic advising system built for Chandigarh University students. This project provides course recommendations based on student interests, academic policy information, and automated appointment scheduling.
+A 100% Client-Side, Keyless, and Anonymous AI academic advising system built for Chandigarh University students.
 
-## 🚀 Features
+## 🚀 100% Serverless & Keyless AI
+This app uses a cutting-edge **Client-Side AI Architecture**. Unlike traditional AI apps, this version **requires NO API Keys** (`OPENAI_API_KEY`, etc.) and no backend configuration. All AI processing is handled strictly by the user's browser using the Puter.js Cloud SDK.
 
-- **AI Chatbot**: Powered by OpenAI GPT-4o for intelligent, context-aware conversations.
-- **Course Recommendations**: Suggests CU courses based on student interests and goals.
-- **Automated Appointments**: Checks for availability (9 AM - 5 PM, Mon-Fri) and schedules advising sessions.
-- **Admin Dashboard**: Visualizes student interaction analytics, sentiment trends, and upcoming appointments.
-- **Sentiment Analysis**: Tracks student mood and feedback sentiment during interactions.
+## 🌟 Features
+- **Anonymous AI Usage**: Anyone can use the AI advisor immediately without signing up.
+- **Personalized Mode**: Sign in with Google (via Puter) to unlock your name in interaction logs and persistent chat history.
+- **Zero-Config Deployment**: Works instantly on Streamlit Community Cloud without adding Secrets or Environment Variables.
+- **Hybrid Logic**: Instantly looks up CU courses and policies locally before consulting the AI for complex queries.
 
 ## 🛠️ Tech Stack
-
 - **Frontend**: Streamlit
-- **AI Engine**: OpenAI API (Function Calling)
+- **AI Driver**: Puter.js (Client-Side `gpt-4o-mini`)
 - **Analytics**: Pandas, Plotly, TextBlob
-- **Data Storage**: Local JSON (for prototyping)
+- **Data Storage**: Local JSONL (Interactions) & Browser KV (Preferences)
 
-## 📋 Local Setup
+## 📋 Quick Setup
 
-1. **Clone the repository**:
+1. **Clone & Install**:
    ```bash
    git clone <your-github-repo-url>
    cd my-gemini-app
-   ```
-
-2. **Create a virtual environment**:
-   ```bash
-   python -m venv .venv
-   source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-   ```
-
-3. **Install dependencies**:
-   ```bash
    pip install -r requirements.txt
    ```
 
-4. **Configure Environment Variables**:
-   Create a `.env` file in the root directory and add your OpenAI API key:
-   ```env
-   OPENAI_API_KEY=your_openai_api_key_here
-   ```
-
-5. **Run the Application**:
+2. **Run Locally**:
    ```bash
    streamlit run app.py
    ```
 
 ## 🌐 Deploy on Streamlit Cloud
-
 1. Push this repository to GitHub.
-2. Open Streamlit Community Cloud and choose **New app**.
-3. Select the GitHub repository, set the branch, and use `app.py` as the main file.
-4. Add `OPENAI_API_KEY` and, if needed, `PUTER_AUTH_TOKEN` in the app secrets or environment settings.
-5. Deploy the app. The Streamlit page title is set to **AI chatbot**.
+2. Connect to [Streamlit Community Cloud](https://share.streamlit.io/).
+3. **Important**: You do **NOT** need to add any secrets. Just hit Deploy!
+4. The app will automatically use the visitor's browser to power the AI.
 
 ## 📂 Project Structure
-
-- `app.py`: Main Streamlit application UI and dashboard logic.
-- `chatbot.py`: Core AI logic, OpenAI integration, and function calling.
-- `data/`: Knowledge base and local storage for logs/appointments.
-- `requirements.txt`: Project dependencies.
+- `app.py`: Main UI and "Headless" AI Bridge orchestration.
+- `puter_bridge/`: The core client-side engine that handles Auth and AI.
+- `chatbot.py`: Knowledge base and local rule-based advisor logic.
+- `data/`: Course information and interaction logs.
 
 ## 📊 MCA Final Semester Project
-Developed as a final semester project for Master of Computer Applications (MCA).
+Developed as a final semester project for Master of Computer Applications (MCA). Focuses on cost-effective, privacy-first AI deployment.
