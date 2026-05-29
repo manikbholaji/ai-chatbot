@@ -1,8 +1,6 @@
 import pytest
 import json
-import os
 import hashlib
-from pathlib import Path
 from app import authenticate, register_user, load_users, save_users, USERS_FILE
 
 @pytest.fixture

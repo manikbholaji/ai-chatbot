@@ -16,6 +16,7 @@ This app uses a cutting-edge **Client-Side AI Architecture**. Unlike traditional
 - **AI Driver**: Puter.js (Client-Side `gpt-4o-mini`)
 - **Analytics**: Pandas, Plotly, TextBlob
 - **Data Storage**: Local JSONL (Interactions) & Browser KV (Preferences)
+- **CI/CD**: GitHub Actions (Ruff, Pytest)
 
 ## 📋 Quick Setup
 
@@ -24,6 +25,7 @@ This app uses a cutting-edge **Client-Side AI Architecture**. Unlike traditional
    git clone <your-github-repo-url>
    cd my-gemini-app
    pip install -r requirements.txt
+   pip install -r requirements-dev.txt
    ```
 
 2. **Run Locally**:
@@ -31,11 +33,23 @@ This app uses a cutting-edge **Client-Side AI Architecture**. Unlike traditional
    streamlit run app.py
    ```
 
+3. **Run Tests**:
+   ```bash
+   pytest
+   ```
+
+4. **Check Linting**:
+   ```bash
+   ruff check .
+   ```
+
 ## 🌐 Deploy on Streamlit Cloud
 1. Push this repository to GitHub.
-2. Connect to [Streamlit Community Cloud](https://share.streamlit.io/).
-3. **Important**: You do **NOT** need to add any secrets. Just hit Deploy!
-4. The app will automatically use the visitor's browser to power the AI.
+2. The **GitHub Actions** workflow will automatically validate your code.
+3. Connect to [Streamlit Community Cloud](https://share.streamlit.io/).
+4. **Important**: You do **NOT** need to add any secrets. Just hit Deploy!
+5. The app will automatically use the visitor's browser to power the AI.
+
 
 ## 📂 Project Structure
 - `app.py`: Main UI and "Headless" AI Bridge orchestration.

@@ -5,7 +5,7 @@ from pathlib import Path
 import pandas as pd
 import plotly.express as px
 from textblob import TextBlob
-from chatbot import get_local_response, book_appointment, SYSTEM_PROMPT
+from chatbot import get_local_response, SYSTEM_PROMPT
 from puter_bridge import puter_bridge
 import uuid
 import hashlib
@@ -69,7 +69,8 @@ def log_interaction(message, response, sentiment, mode):
 
 def load_recent_history(username, limit=10):
     log_f = project_path("data", "interaction_logs.jsonl")
-    if not os.path.exists(log_f): return []
+    if not os.path.exists(log_f):
+        return []
     
     user_messages = []
     with open(log_f, "r") as f:
@@ -103,7 +104,8 @@ def save_users(users):
 
 def register_user(username, password):
     users = load_users()
-    if username in users: return False, "Username exists"
+    if username in users:
+        return False, "Username exists"
     users[username] = {
         "password": hashlib.sha256(password.encode()).hexdigest(),
         "role": "student"
@@ -149,7 +151,8 @@ with st.sidebar:
                         if not st.session_state.messages:
                             st.session_state.messages = load_recent_history(u_in)
                         st.rerun()
-                    else: st.error("Invalid credentials")
+                    else:
+                        st.error("Invalid credentials")
         
         with auth_tab2:
             with st.form("signup_form"):
@@ -160,8 +163,10 @@ with st.sidebar:
                         st.warning("Too short!")
                     else:
                         ok, msg = register_user(new_u, new_p)
-                        if ok: st.success(msg)
-                        else: st.error(msg)
+                        if ok:
+                            st.success(msg)
+                        else:
+                            st.error(msg)
 
     st.caption("✅ Mode: " + ("Personalized" if st.session_state.authenticated else "Anonymous"))
 
@@ -172,8 +177,10 @@ pages = ["Student Advisor", "Chat History"]
 if st.session_state.authenticated and st.session_state.user.get('role') == 'admin':
     pages.append("Admin Dashboard")
 
-if "page" not in st.session_state: st.session_state.page = "Student Advisor"
-if st.session_state.page not in pages: st.session_state.page = "Student Advisor"
+if "page" not in st.session_state:
+    st.session_state.page = "Student Advisor"
+if st.session_state.page not in pages:
+    st.session_state.page = "Student Advisor"
 
 nav_page = st.sidebar.radio("Navigation", pages, index=pages.index(st.session_state.page))
 st.session_state.page = nav_page
@@ -259,7 +266,8 @@ elif st.session_state.page == "Chat History":
         if st.session_state.messages:
             st.subheader("Current Session")
             for msg in st.session_state.messages:
-                with st.chat_message(msg["role"]): st.write(msg["content"])
+                with st.chat_message(msg["role"]):
+                    st.write(msg["content"])
     else:
         u_name = st.session_state.user['name']
         log_f = project_path("data", "interaction_logs.jsonl")
@@ -269,7 +277,8 @@ elif st.session_state.page == "Chat History":
             with open(log_f, "r") as f:
                 for line in f:
                     entry = json.loads(line)
-                    if entry.get("user") == u_name: logs.append(entry)
+                    if entry.get("user") == u_name:
+                        logs.append(entry)
             
             if logs:
                 df = pd.DataFrame(logs)
@@ -283,10 +292,14 @@ elif st.session_state.page == "Chat History":
                         for _, r in d_logs.iterrows():
                             c1, c2 = st.columns([1, 10])
                             c1.caption(r['timestamp'].strftime('%H:%M'))
-                            with st.chat_message("user"): st.write(r['student_message'])
-                            with st.chat_message("assistant"): st.write(r['bot_response'])
-            else: st.info("No recorded logs for this name.")
-        else: st.info("Database empty.")
+                            with st.chat_message("user"):
+                                st.write(r['student_message'])
+                            with st.chat_message("assistant"):
+                                st.write(r['bot_response'])
+            else:
+                st.info("No recorded logs for this name.")
+        else:
+            st.info("Database empty.")
 
 # --- PAGE: ADMIN DASHBOARD ---
 elif st.session_state.page == "Admin Dashboard":
@@ -295,7 +308,7 @@ elif st.session_state.page == "Admin Dashboard":
     log_f = project_path("data", "interaction_logs.jsonl")
     if os.path.exists(log_f):
         with open(log_f, "r") as f:
-            logs = [json.loads(l) for l in f]
+            logs = [json.loads(line) for line in f]
         df = pd.DataFrame(logs)
         df['timestamp'] = pd.to_datetime(df['timestamp'])
         
@@ -310,7 +323,8 @@ elif st.session_state.page == "Admin Dashboard":
         
         st.subheader("Recent Activity")
         st.dataframe(df[['timestamp', 'user', 'mode', 'student_message', 'bot_response']], use_container_width=True)
-    else: st.info("No logs collected yet.")
+    else:
+        st.info("No logs collected yet.")
 
 # --- PAGE: APPOINTMENT MANAGEMENT ---
 elif st.session_state.page == "Appointment Management":

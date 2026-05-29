@@ -1,23 +1,14 @@
-import pytest
 from app import load_recent_history
 import json
-import os
 
-def test_load_recent_history_empty(tmp_path):
+def test_load_recent_history_empty(tmp_path, monkeypatch):
     """Test loading history from non-existent file."""
     import app
-    original_log = app.project_path("data", "interaction_logs.jsonl")
+    # Point to a non-existent path
+    monkeypatch.setattr(app, "project_path", lambda *parts: tmp_path.joinpath("missing", *parts))
     
-    # Mock log file path to a non-existent one
-    temp_log = tmp_path / "missing_logs.jsonl"
-    
-    # We need to mock the project_path return or similar
-    # For simplicity, let's just use the real function if we can control the environment
-    # But load_recent_history has a hardcoded path based on project_path
-    
-    # Let's try to pass the username and see it returns [] if file doesn't exist
-    # Note: load_recent_history uses project_path("data", "interaction_logs.jsonl")
-    # We might need to monkeypatch it.
+    history = load_recent_history("any_user")
+    assert history == []
     
 def test_load_recent_history_filtering(tmp_path, monkeypatch):
     """Test that history is correctly filtered and limited by username."""
