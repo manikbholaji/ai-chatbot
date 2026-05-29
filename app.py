@@ -8,6 +8,7 @@ from textblob import TextBlob
 from chatbot import get_local_response, book_appointment, SYSTEM_PROMPT
 from puter_bridge import puter_bridge
 import uuid
+import hashlib
 
 BASE_DIR = Path(__file__).resolve().parent
 
@@ -66,41 +67,83 @@ def log_interaction(message, response, sentiment, mode):
     with open(log_file, "a") as f:
         f.write(json.dumps(log_entry) + "\n")
 
-# --- SIDEBAR: NAVIGATION & AUTH ---
+# --- LOCAL USER DATABASE SYSTEM ---
+USERS_FILE = project_path("data", "users.json")
+
+def init_db():
+    os.makedirs(USERS_FILE.parent, exist_ok=True)
+    if not USERS_FILE.exists():
+        with open(USERS_FILE, "w") as f:
+            # Pre-register Admin
+            admin_hash = hashlib.sha256("Manik".encode()).hexdigest()
+            json.dump({"Manik": {"password": admin_hash, "role": "admin"}}, f)
+
+def load_users():
+    init_db()
+    with open(USERS_FILE, "r") as f:
+        return json.load(f)
+
+def save_users(users):
+    with open(USERS_FILE, "w") as f:
+        json.dump(users, f, indent=4)
+
+def register_user(username, password):
+    users = load_users()
+    if username in users: return False, "Username exists"
+    users[username] = {
+        "password": hashlib.sha256(password.encode()).hexdigest(),
+        "role": "student"
+    }
+    save_users(users)
+    return True, "Account created!"
+
+def authenticate(username, password):
+    users = load_users()
+    pw_hash = hashlib.sha256(password.encode()).hexdigest()
+    if username in users and users[username]["password"] == pw_hash:
+        return True, users[username]["role"]
+    return False, None
+
+# --- SIDEBAR: AUTH & NAVIGATION ---
 st.sidebar.title("🎓 CU Advisor")
 
 with st.sidebar:
-    st.markdown("### 🔐 User Setup")
+    st.markdown("### 🔐 User Account")
     
     if st.session_state.authenticated:
-        st.success(f"Signed in as **{st.session_state.user['name']}**")
-        if st.button("Sign Out / Reset", use_container_width=True):
+        st.success(f"Welcome, **{st.session_state.user['name']}**")
+        st.caption(f"Role: {st.session_state.user['role'].title()}")
+        if st.button("Logout", use_container_width=True):
             st.session_state.authenticated = False
             st.session_state.user = None
             st.session_state.messages = []
             st.rerun()
     else:
-        with st.expander("Enable Personalization", expanded=True):
-            u_name = st.text_input("Full Name", placeholder="e.g. John Doe")
-            is_adm = st.checkbox("Admin Credentials")
-            adm_p = ""
-            if is_adm:
-                adm_p = st.text_input("Password", type="password")
-            
-            if st.button("Apply Settings", use_container_width=True):
-                if is_adm:
-                    if u_name == "Manik" and adm_p == "Manik":
+        auth_tab1, auth_tab2 = st.tabs(["Login", "Sign Up"])
+        
+        with auth_tab1:
+            with st.form("login_form"):
+                u_in = st.text_input("Username")
+                p_in = st.text_input("Password", type="password")
+                if st.form_submit_button("Login", use_container_width=True):
+                    success, role = authenticate(u_in, p_in)
+                    if success:
                         st.session_state.authenticated = True
-                        st.session_state.user = {"name": "Manik", "role": "admin"}
+                        st.session_state.user = {"name": u_in, "role": role}
                         st.rerun()
+                    else: st.error("Invalid credentials")
+        
+        with auth_tab2:
+            with st.form("signup_form"):
+                new_u = st.text_input("New Username")
+                new_p = st.text_input("New Password", type="password")
+                if st.form_submit_button("Create Account", use_container_width=True):
+                    if len(new_u) < 3 or len(new_p) < 4:
+                        st.warning("Too short!")
                     else:
-                        st.error("Invalid Admin Access")
-                elif u_name.strip():
-                    st.session_state.authenticated = True
-                    st.session_state.user = {"name": u_name.strip(), "role": "student"}
-                    st.rerun()
-                else:
-                    st.warning("Please provide a name")
+                        ok, msg = register_user(new_u, new_p)
+                        if ok: st.success(msg)
+                        else: st.error(msg)
 
     st.caption("✅ Mode: " + ("Personalized" if st.session_state.authenticated else "Anonymous"))
 
