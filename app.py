@@ -312,5 +312,61 @@ elif st.session_state.page == "Admin Dashboard":
         st.dataframe(df[['timestamp', 'user', 'mode', 'student_message', 'bot_response']], use_container_width=True)
     else: st.info("No logs collected yet.")
 
+# --- PAGE: APPOINTMENT MANAGEMENT ---
+elif st.session_state.page == "Appointment Management":
+    st.title("📅 Appointment Management")
+    st.markdown("Professional oversight of all academic advising schedules.")
+    
+    appt_f = project_path("data", "appointments.json")
+    if os.path.exists(appt_f):
+        with open(appt_f, "r") as f:
+            appts = json.load(f)
+        
+        if appts:
+            df = pd.DataFrame(appts)
+            # Ensure proper typing for sorting
+            df['datetime'] = pd.to_datetime(df['date'] + ' ' + df['time'])
+            df = df.sort_values('datetime', ascending=True)
+            
+            # KPI Metrics
+            m1, m2, m3 = st.columns(3)
+            m1.metric("Total Appointments", len(df))
+            upcoming = len(df[df['datetime'] >= pd.Timestamp.now()])
+            m2.metric("Upcoming Sessions", upcoming)
+            m3.metric("Unique Students", df['student_name'].nunique())
+            
+            st.divider()
+            
+            # Beautiful Calendar-style View
+            st.subheader("📅 Scheduled Sessions")
+            
+            # Group by Date for better organization
+            for date, group in df.groupby('date'):
+                with st.expander(f"🗓️ {pd.to_datetime(date).strftime('%A, %d %B %Y')}", expanded=True):
+                    for _, row in group.iterrows():
+                        with st.container():
+                            c1, c2, c3 = st.columns([1, 3, 2])
+                            with c1:
+                                st.markdown(f"### {row['time']}")
+                            with c2:
+                                st.markdown(f"**Student:** {row['student_name']}")
+                                st.caption(f"**Query/Topic:** {row['course_name']}")
+                            with c3:
+                                st.info(f"Booked on: {pd.to_datetime(row['timestamp']).strftime('%Y-%m-%d')}")
+                            st.divider()
+            
+            # Data Export Option
+            st.download_button(
+                label="📥 Export Schedule (CSV)",
+                data=df.to_csv(index=False).encode('utf-8'),
+                file_name=f"cu_appointments_{pd.Timestamp.now().strftime('%Y%m%d')}.csv",
+                mime='text/csv',
+                use_container_width=True
+            )
+        else:
+            st.info("No appointments have been booked yet.")
+    else:
+        st.info("Appointment database not found.")
+
 st.sidebar.markdown("---")
 st.sidebar.caption("MCA Final Project | Serverless AI Architecture")
