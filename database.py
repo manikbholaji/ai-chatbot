@@ -57,24 +57,37 @@ class Appointment(Base):
 def get_engine():
     """
     Returns a SQLAlchemy engine. 
-    Prioritizes Online PostgreSQL (via Streamlit Secrets) -> Fallback to Local SQLite.
+    Strictly uses Production PostgreSQL (via Streamlit Secrets).
     """
-    # 1. Try to get connection string from Streamlit Secrets (Production/Online)
-    try:
-        if "database" in st.secrets:
-            db_url = st.secrets.database.url
-            if db_url:
-                # Fix for SQLAlchemy/Heroku style postgresql:// vs postgres://
-                if db_url.startswith("postgres://"):
-                    db_url = db_url.replace("postgres://", "postgresql://", 1)
-                return create_engine(db_url)
-    except Exception:
-        pass
+    if "database" not in st.secrets:
+        raise ConnectionError("CRITICAL: [database] section missing in Streamlit Secrets.")
     
-    # 2. Local Fallback (SQLite)
-    db_path = BASE_DIR.joinpath("data", "university.db")
-    os.makedirs(db_path.parent, exist_ok=True)
-    return create_engine(f"sqlite:///{db_path}")
+    db_url = st.secrets.database.get("url")
+    if not db_url:
+        raise ConnectionError("CRITICAL: 'url' key missing in Streamlit Secrets [database] section.")
+    
+    # Expert Safeguard: Remove ALL white spaces (internal and external)
+    # A database URL should never contain spaces.
+    db_url = db_url.strip().replace(" ", "")
+
+    # Fix for SQLAlchemy/Heroku style postgresql:// vs postgres://
+    if db_url.startswith("postgres://"):
+        db_url = db_url.replace("postgres://", "postgresql://", 1)
+        
+    try:
+        engine = create_engine(db_url, pool_pre_ping=True)
+        # Test connection immediately
+        with engine.connect() as conn:
+            pass
+        return engine
+    except Exception as e:
+        st.error(f"❌ Database Connection Failed: {str(e)}")
+        # Provide a hint for common issues
+        if "password authentication failed" in str(e).lower():
+            st.info("💡 Hint: Check your password and URL encoding in Secrets.")
+        elif "timeout" in str(e).lower() or "could not connect" in str(e).lower():
+            st.info("💡 Hint: Ensure Aiven 'Allowed IP addresses' is set to 0.0.0.0/0.")
+        raise e
 
 Engine = get_engine()
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=Engine)
@@ -90,6 +103,27 @@ def init_db():
     
     # Pre-populate with default data if empty
     db = SessionLocal()
+    
+    # 1. Professional Admin Bootstrap (Ensures admin/admin always works)
+    import hashlib
+    admin_username = "admin"
+    admin_password = "admin"
+    pw_hash = hashlib.sha256(admin_password.encode()).hexdigest()
+    
+    existing_admin = db.query(User).filter(User.username == admin_username).first()
+    if not existing_admin:
+        new_admin = User(username=admin_username, password_hash=pw_hash, role="admin")
+        db.add(new_admin)
+        db.commit()
+        print("Master admin created.")
+    else:
+        # Force-sync password and role for demo reliability
+        existing_admin.password_hash = pw_hash
+        existing_admin.role = "admin"
+        db.commit()
+        print("Master admin synchronized.")
+
+    # 2. Default Courses
     if db.query(Course).count() == 0:
         default_courses = [
             Course(id="mca", name="Master of Computer Applications", department="Computer Applications", 
@@ -128,6 +162,9 @@ def get_session():
     return SessionLocal()
 
 def authenticate_user(username, password_hash):
+    """
+    Authenticates a user and returns their role strictly from the database.
+    """
     db = get_session()
     user = db.query(User).filter(User.username == username, User.password_hash == password_hash).first()
     role = user.role if user else None
