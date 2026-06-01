@@ -1,14 +1,16 @@
 
 import pytest
 import hashlib
+from sqlalchemy import create_engine
 from app import authenticate, register_user
-from database import set_db_path, init_db, add_user
+from database import set_test_engine, init_db, add_user
 
 @pytest.fixture
 def setup_db(tmp_path):
     """Fixture to create a temporary database."""
     temp_db = tmp_path / "test_university.db"
-    set_db_path(temp_db)
+    engine = create_engine(f"sqlite:///{temp_db}")
+    set_test_engine(engine)
     init_db()
     
     # Pre-register test admin

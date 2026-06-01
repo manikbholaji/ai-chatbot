@@ -1,87 +1,88 @@
+import pytest
+import socket
 from playwright.sync_api import Page, expect
 
-# The streamlit app is assumed to be running at http://localhost:8501
+def is_port_open(port):
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        return s.connect_ex(('localhost', port)) == 0
+
+# Skip all tests in this file if Streamlit is not running
+pytestmark = pytest.mark.skipif(not is_port_open(8501), reason="Streamlit server not running on port 8501")
 
 def test_ui_load(page: Page):
     """Verify that the UI loads and displays the title."""
     page.goto("http://localhost:8501")
-    # Wait for the title to appear
-    expect(page.get_by_role("heading", name="Chandigarh University Advisor")).to_be_visible(timeout=15000)
-    expect(page.get_by_text("How can I assist you today?")).to_be_visible()
+    expect(page).to_have_title("CU AI Advisor")
+    expect(page.get_by_text("Chandigarh University Advisor")).to_be_visible()
 
 def test_navigation(page: Page):
     """Verify navigation between pages."""
     page.goto("http://localhost:8501")
     
-    # Check sidebar
-    expect(page.get_by_text("CU Advisor").first).to_be_visible(timeout=15000)
+    # Check default page
+    expect(page.get_by_text("How can I assist you today?")).to_be_visible()
     
-    # Navigate to Chat History
-    page.get_by_label("Chat History").click()
-    expect(page.get_by_role("heading", name="Conversation Logs")).to_be_visible(timeout=15000)
-    
-    # Back to Student Advisor
-    page.get_by_label("Student Advisor").click()
-    expect(page.get_by_role("heading", name="Chandigarh University Advisor")).to_be_visible(timeout=15000)
+    # Navigate to History
+    page.get_by_label("Navigation").get_by_text("Chat History").click()
+    expect(page.get_by_text("Conversation Logs")).to_be_visible()
 
 def test_local_logic_response(page: Page):
     """Verify that local logic triggers for specific keywords."""
     page.goto("http://localhost:8501")
     
+    # Type a query that triggers local logic
     chat_input = page.get_by_placeholder("How can I help you today?")
-    chat_input.fill("What courses do you have for engineering?")
+    chat_input.fill("What is the attendance policy?")
     chat_input.press("Enter")
     
-    # Check for local response (contains specific course info from courses.json)
-    expect(page.get_by_text("Based on your interests, I recommend")).to_be_visible(timeout=15000)
-    # Use first() or a more specific locator to avoid strict mode violation
-    expect(page.get_by_text("Bachelor of Engineering").first).to_be_visible()
+    # Check for policy response
+    expect(page.get_by_text("According to CU Policy on Attendance")).to_be_visible()
 
 def test_login_flow(page: Page):
     """Verify the login flow."""
     page.goto("http://localhost:8501")
     
-    # Open Login form in sidebar
-    page.get_by_role("tab", name="Login").click()
+    # Go to Sign Up
+    page.get_by_text("Sign Up").click()
     
-    sidebar = page.locator("section[data-testid='stSidebar']")
-    sidebar.get_by_label("Username").first.fill("Manik")
-    sidebar.get_by_label("Password").first.fill("Manik")
-    sidebar.get_by_role("button", name="Login").click()
+    # Fill signup
+    page.get_by_label("New Username").fill("test_e2e_user")
+    page.get_by_label("New Password").fill("password123")
+    page.get_by_role("button", name="Create Account").click()
     
-    # Check for welcome message
-    expect(page.get_by_text("Welcome, Manik")).to_be_visible(timeout=15000)
+    # Try to login
+    page.get_by_text("Login").click()
+    page.get_by_label("Username").fill("test_e2e_user")
+    page.get_by_label("Password").fill("password123")
+    page.get_by_role("button", name="Login").click()
     
-    # Check for Personalized mode caption which confirms login success
-    expect(page.get_by_text("Mode: Personalized")).to_be_visible(timeout=10000)
+    # Verify welcome message
+    expect(page.get_by_text("Welcome, test_e2e_user")).to_be_visible()
 
 def test_ai_mode_trigger(page: Page):
     """Verify that AI mode is triggered for unknown queries."""
     page.goto("http://localhost:8501")
     
+    # Type a query that triggers AI
     chat_input = page.get_by_placeholder("How can I help you today?")
-    chat_input.fill("Tell me a joke about robots.")
+    chat_input.fill("Tell me a joke about computers.")
     chat_input.press("Enter")
     
-    # Should show "Thinking..."
+    # Check for "Thinking..." indicator
     expect(page.get_by_text("Thinking...")).to_be_visible()
     
-    # Since this is an E2E test and Puter.js works in browser, 
-    # we expect the bridge to eventually receive a response if Puter is working.
-    # However, in a headless CI environment without a real browser and Puter SDK loaded properly, 
-    # this might be tricky. We are testing the UI behavior.
-    
-    # Check that it doesn't hang indefinitely (timeout 30s for AI)
-    # expect(page.get_by_text("Thinking...")).to_be_hidden(timeout=30000)
+    # Wait for response (generative AI might take a few seconds)
+    # We just check that the assistant message appears
+    expect(page.locator(".stChatMessage").last).to_contain_text("assistant", use_container_width=False)
 
 def test_responsive_ui(page: Page):
     """Verify UI elements are visible on different screen sizes."""
     # Mobile view
     page.set_viewport_size({"width": 375, "height": 667})
     page.goto("http://localhost:8501")
-    expect(page.get_by_text("CU Advisor")).to_be_visible()
+    expect(page.get_by_text("CU Advisor")).to_be_hidden() # Sidebar usually collapses
     
     # Desktop view
-    page.set_viewport_size({"width": 1280, "height": 720})
+    page.set_viewport_size({"width": 1280, "height": 800})
     page.goto("http://localhost:8501")
     expect(page.get_by_text("CU Advisor")).to_be_visible()

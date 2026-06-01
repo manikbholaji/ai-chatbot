@@ -1,10 +1,7 @@
 
 import streamlit as st
-import json
-import os
 from pathlib import Path
 import pandas as pd
-import plotly.express as px
 from textblob import TextBlob
 from chatbot import get_local_response, SYSTEM_PROMPT
 from puter_bridge import puter_bridge
@@ -254,8 +251,10 @@ elif st.session_state.page == "Chat History":
         history = get_user_history(u_name, limit=50)
         if history:
             for i in range(0, len(history), 2):
-                with st.chat_message("user"): st.write(history[i]['content'])
-                with st.chat_message("assistant"): st.write(history[i+1]['content'])
+                with st.chat_message("user"): 
+                    st.write(history[i]['content'])
+                with st.chat_message("assistant"): 
+                    st.write(history[i+1]['content'])
                 st.divider()
         else:
             st.info("No recorded logs for this name.")
