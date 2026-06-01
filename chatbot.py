@@ -1,6 +1,4 @@
 
-import sqlite3
-from pathlib import Path
 from datetime import datetime
 import json
 import re
@@ -104,7 +102,7 @@ def get_local_response(query):
 
     # 3. Direct Greeting/Identity
     greetings = ["hi", "hello", "hey", "who are you", "what can you do"]
-    if any(query_clean == g for g in greetings) or (re.search(rf"\bhelp\b", query_clean) and len(query_clean) < 10):
+    if any(query_clean == g for g in greetings) or (re.search(r"\bhelp\b", query_clean) and len(query_clean) < 10):
         return "Hello! I am your CU Academic Advisor. I can help you with course information, university policies, and booking appointments. How can I assist you today?"
 
     return None

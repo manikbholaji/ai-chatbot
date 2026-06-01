@@ -68,7 +68,7 @@ def get_engine():
                 if db_url.startswith("postgres://"):
                     db_url = db_url.replace("postgres://", "postgresql://", 1)
                 return create_engine(db_url)
-    except:
+    except Exception:
         pass
     
     # 2. Local Fallback (SQLite)
@@ -78,6 +78,12 @@ def get_engine():
 
 Engine = get_engine()
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=Engine)
+
+def set_test_engine(test_engine):
+    """Overrides the global engine and session for testing."""
+    global Engine, SessionLocal
+    Engine = test_engine
+    SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=Engine)
 
 def init_db():
     Base.metadata.create_all(bind=Engine)
@@ -135,7 +141,7 @@ def add_user(username, password_hash, role='student'):
         db.add(new_user)
         db.commit()
         return True, "Account created!"
-    except:
+    except Exception:
         return False, "Username exists"
     finally:
         db.close()
@@ -164,13 +170,13 @@ def get_all_logs():
     db.close()
     return [
         {
-            "timestamp": l.timestamp.isoformat(),
-            "user": l.user,
-            "mode": l.mode,
-            "student_message": l.student_message,
-            "bot_response": l.bot_response,
-            "sentiment": l.sentiment
-        } for l in logs
+            "timestamp": entry.timestamp.isoformat(),
+            "user": entry.user,
+            "mode": entry.mode,
+            "student_message": entry.student_message,
+            "bot_response": entry.bot_response,
+            "sentiment": entry.sentiment
+        } for entry in logs
     ]
 
 def get_courses_db():
