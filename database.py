@@ -1,5 +1,6 @@
 
 import streamlit as st
+from streamlit.errors import StreamlitSecretNotFoundError
 from sqlalchemy import create_engine, Column, String, Integer, Float, Text, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
@@ -64,21 +65,21 @@ def get_engine():
     if os.getenv("TESTING") == "true":
         return create_engine("sqlite:///:memory:")
 
-    # 2. Production Logic
-    if "database" not in st.secrets:
-        # Fallback for local development when not in testing mode
-        # This prevents the app from crashing immediately but still shows the error in UI
-        try:
-             # Just return a dummy engine that fails on connect
-             return create_engine("sqlite:///")
-        except:
-             raise ConnectionError("CRITICAL: [database] section missing in Streamlit Secrets.")
-    
-    db_url = st.secrets.database.get("url")
+    # 2. Production / Local development logic
+    try:
+        db_config = st.secrets.get("database")
+    except StreamlitSecretNotFoundError:
+        db_config = None
+
+    if not db_config:
+        local_db_path = BASE_DIR / "data" / "university.db"
+        return create_engine(f"sqlite:///{local_db_path}")
+
+    db_url = db_config.get("url")
     if not db_url:
         raise ConnectionError("CRITICAL: 'url' key missing in Streamlit Secrets [database] section.")
     
-    db_url = db_url.strip().replace(" ", "")
+    db_url = db_url.strip()
 
     if db_url.startswith("postgres://"):
         db_url = db_url.replace("postgres://", "postgresql://", 1)
@@ -86,11 +87,46 @@ def get_engine():
     try:
         # pool_pre_ping=True helps with dropped connections in cloud environments
         engine = create_engine(db_url, pool_pre_ping=True)
+        with engine.connect():
+            pass
         return engine
-    except Exception as e:
-        # We don't want to crash the whole app during import if possible
-        # but we must ensure it doesn't work without a valid connection
-        return create_engine("sqlite:///") # Return failing engine
+    except Exception as exc:
+        raise ConnectionError(f"CRITICAL: Database connection failed: {exc}") from exc
+
+def _read_secret_section(section_name):
+    try:
+        return st.secrets.get(section_name)
+    except StreamlitSecretNotFoundError:
+        return None
+
+def _is_admin_bootstrap_enabled():
+    env_value = os.getenv("ENABLE_ADMIN_BOOTSTRAP")
+    if env_value is not None:
+        return env_value.strip().lower() == "true"
+
+    bootstrap_secrets = _read_secret_section("admin_bootstrap")
+    if not bootstrap_secrets:
+        return False
+
+    enabled = bootstrap_secrets.get("enabled", False)
+    if isinstance(enabled, bool):
+        return enabled
+    if isinstance(enabled, str):
+        return enabled.strip().lower() == "true"
+    return False
+
+def _get_admin_bootstrap_credentials():
+    username = os.getenv("ADMIN_BOOTSTRAP_USERNAME")
+    password_hash = os.getenv("ADMIN_BOOTSTRAP_PASSWORD_HASH")
+
+    if username and password_hash:
+        return username, password_hash
+
+    bootstrap_secrets = _read_secret_section("admin_bootstrap")
+    if not bootstrap_secrets:
+        return None, None
+
+    return bootstrap_secrets.get("username"), bootstrap_secrets.get("password_hash")
 
 # Initialize Global Engine
 Engine = get_engine()
@@ -112,21 +148,14 @@ def init_db():
         
         db = SessionLocal()
         
-        # 1. Professional Admin Bootstrap
-        import hashlib
-        admin_username = "admin"
-        admin_password = "admin"
-        pw_hash = hashlib.sha256(admin_password.encode()).hexdigest()
-        
-        existing_admin = db.query(User).filter(User.username == admin_username).first()
-        if not existing_admin:
-            new_admin = User(username=admin_username, password_hash=pw_hash, role="admin")
-            db.add(new_admin)
-            db.commit()
-        else:
-            existing_admin.password_hash = pw_hash
-            existing_admin.role = "admin"
-            db.commit()
+        # 1. Optional Admin Bootstrap
+        if _is_admin_bootstrap_enabled():
+            admin_username, admin_password_hash = _get_admin_bootstrap_credentials()
+            if admin_username and admin_password_hash:
+                existing_admin = db.query(User).filter(User.username == admin_username).first()
+                if not existing_admin:
+                    new_admin = User(username=admin_username, password_hash=admin_password_hash, role="admin")
+                    db.add(new_admin)
 
         # 2. Default Courses
         if db.query(Course).count() == 0:
