@@ -1,0 +1,186 @@
+
+import streamlit as st
+from sqlalchemy import create_engine, Column, String, Integer, Float, Text, DateTime
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
+from pathlib import Path
+from datetime import datetime
+import os
+
+BASE_DIR = Path(__file__).resolve().parent
+Base = declarative_base()
+
+# --- DATABASE MODELS ---
+
+class User(Base):
+    __tablename__ = 'users'
+    username = Column(String(50), primary_key=True)
+    password_hash = Column(String(255), nullable=False)
+    role = Column(String(20), default='student')
+
+class Course(Base):
+    __tablename__ = 'courses'
+    id = Column(String(50), primary_key=True)
+    name = Column(String(100), nullable=False)
+    department = Column(String(100))
+    description = Column(Text)
+    interests = Column(Text) # Comma-separated
+    duration = Column(String(50))
+
+class Policy(Base):
+    __tablename__ = 'policies'
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    topic = Column(String(100), nullable=False)
+    description = Column(Text, nullable=False)
+
+class InteractionLog(Base):
+    __tablename__ = 'interaction_logs'
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    timestamp = Column(DateTime, default=datetime.now)
+    user = Column(String(50))
+    mode = Column(String(50))
+    student_message = Column(Text)
+    bot_response = Column(Text)
+    sentiment = Column(Float)
+
+class Appointment(Base):
+    __tablename__ = 'appointments'
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    student_name = Column(String(100))
+    course_name = Column(String(100))
+    date = Column(String(20))
+    time = Column(String(20))
+    timestamp = Column(DateTime, default=datetime.now)
+
+# --- CONNECTION MANAGEMENT ---
+
+def get_engine():
+    """
+    Returns a SQLAlchemy engine. 
+    Prioritizes Online PostgreSQL (via Streamlit Secrets) -> Fallback to Local SQLite.
+    """
+    # 1. Try to get connection string from Streamlit Secrets (Production/Online)
+    try:
+        if "database" in st.secrets:
+            db_url = st.secrets.database.url
+            if db_url:
+                # Fix for SQLAlchemy/Heroku style postgresql:// vs postgres://
+                if db_url.startswith("postgres://"):
+                    db_url = db_url.replace("postgres://", "postgresql://", 1)
+                return create_engine(db_url)
+    except:
+        pass
+    
+    # 2. Local Fallback (SQLite)
+    db_path = BASE_DIR.joinpath("data", "university.db")
+    os.makedirs(db_path.parent, exist_ok=True)
+    return create_engine(f"sqlite:///{db_path}")
+
+Engine = get_engine()
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=Engine)
+
+def init_db():
+    Base.metadata.create_all(bind=Engine)
+
+# --- HELPER FUNCTIONS ---
+
+def get_session():
+    return SessionLocal()
+
+def authenticate_user(username, password_hash):
+    db = get_session()
+    user = db.query(User).filter(User.username == username, User.password_hash == password_hash).first()
+    role = user.role if user else None
+    db.close()
+    return role
+
+def add_user(username, password_hash, role='student'):
+    db = get_session()
+    try:
+        new_user = User(username=username, password_hash=password_hash, role=role)
+        db.add(new_user)
+        db.commit()
+        return True, "Account created!"
+    except:
+        return False, "Username exists"
+    finally:
+        db.close()
+
+def log_interaction_db(user, mode, message, response, sentiment):
+    db = get_session()
+    log = InteractionLog(user=user, mode=mode, student_message=message, bot_response=response, sentiment=sentiment)
+    db.add(log)
+    db.commit()
+    db.close()
+
+def get_user_history(username, limit=10):
+    db = get_session()
+    logs = db.query(InteractionLog).filter(InteractionLog.user == username).order_by(InteractionLog.timestamp.desc()).limit(limit).all()
+    db.close()
+    
+    history = []
+    for log in reversed(logs):
+        history.append({"role": "user", "content": log.student_message})
+        history.append({"role": "assistant", "content": log.bot_response})
+    return history
+
+def get_all_logs():
+    db = get_session()
+    logs = db.query(InteractionLog).order_by(InteractionLog.timestamp.desc()).all()
+    db.close()
+    return [
+        {
+            "timestamp": l.timestamp.isoformat(),
+            "user": l.user,
+            "mode": l.mode,
+            "student_message": l.student_message,
+            "bot_response": l.bot_response,
+            "sentiment": l.sentiment
+        } for l in logs
+    ]
+
+def get_courses_db():
+    db = get_session()
+    courses = db.query(Course).all()
+    db.close()
+    return [
+        {
+            "id": c.id,
+            "name": c.name,
+            "department": c.department,
+            "description": c.description,
+            "interests": c.interests,
+            "duration": c.duration
+        } for c in courses
+    ]
+
+def get_policies_db():
+    db = get_session()
+    policies = db.query(Policy).all()
+    db.close()
+    return [{"topic": p.topic, "description": p.description} for p in policies]
+
+def add_appointment_db(student_name, course_name, date, time):
+    db = get_session()
+    appt = Appointment(student_name=student_name, course_name=course_name, date=date, time=time)
+    db.add(appt)
+    db.commit()
+    db.close()
+
+def get_appointments_db():
+    db = get_session()
+    appts = db.query(Appointment).order_by(Appointment.date, Appointment.time).all()
+    db.close()
+    return [
+        {
+            "student_name": a.student_name,
+            "course_name": a.course_name,
+            "date": a.date,
+            "time": a.time,
+            "timestamp": a.timestamp.isoformat()
+        } for a in appts
+    ]
+
+if __name__ == "__main__":
+    init_db()
+    print("Database initialized successfully.")

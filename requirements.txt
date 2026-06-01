@@ -2,3 +2,12 @@ streamlit
 pandas
 textblob
 plotly
+sqlalchemy
+psycopg2-binary
+reportlab
+pypdf
+python-docx
+Pillow
+pytest
+playwright
+pytest-playwright

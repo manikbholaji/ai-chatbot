@@ -1,25 +1,21 @@
-import json
+
+import sqlite3
 from pathlib import Path
 from datetime import datetime
-# Load Knowledge Base
-BASE_DIR = Path(__file__).resolve().parent
+import json
+import re
+from database import get_courses_db, get_policies_db, add_appointment_db
 
-def project_path(*parts):
-    return BASE_DIR.joinpath(*parts)
-
+# Load Knowledge Base from SQLite
 def load_data():
-    courses_path = project_path("data", "courses.json")
-    policies_path = project_path("data", "policies.json")
+    courses = get_courses_db()
+    policies = get_policies_db()
     
-    courses = []
-    policies = []
-    
-    if courses_path.exists():
-        with open(courses_path, "r") as f:
-            courses = json.load(f).get("courses", [])
-    if policies_path.exists():
-        with open(policies_path, "r") as f:
-            policies = json.load(f).get("policies", [])
+    # Format courses to include list of interests
+    for c in courses:
+        if isinstance(c['interests'], str):
+            c['interests'] = c['interests'].split(",") if c['interests'] else []
+            
     return courses, policies
 
 COURSES, POLICIES = load_data()
@@ -35,29 +31,10 @@ def book_appointment(date, time, student_name, course_name):
         if not (9 <= dt.hour < 17):
             return "Error: Appointments must be between 9:00 AM and 5:00 PM."
         
-        appointment = {
-            "student_name": student_name,
-            "course_name": course_name,
-            "date": date,
-            "time": time,
-            "timestamp": datetime.now().isoformat()
-        }
-        
-        appointments_file = project_path("data", "appointments.json")
-        appointments = []
-        if appointments_file.exists():
-            with open(appointments_file, "r") as f:
-                appointments = json.load(f)
-            
-        appointments.append(appointment)
-        with open(appointments_file, "w") as f:
-            json.dump(appointments, f, indent=2)
-            
+        add_appointment_db(student_name, course_name, date, time)
         return f"Success: Appointment booked for {student_name} on {date} at {time} for {course_name}."
     except Exception as e:
         return f"Error: {str(e)}"
-
-import re
 
 def get_local_response(query):
     """
@@ -74,8 +51,6 @@ def get_local_response(query):
 
     # 1. Search for courses (Improved matching with word boundaries)
     course_keywords = ["course", "degree", "study", "program", "admission", "department"]
-    
-    # Check if any course keyword exists as a whole word (handling potential plural)
     has_course_context = any(re.search(rf"\b{re.escape(k)}s?\b", query_clean) for k in course_keywords)
     
     if has_course_context or any(re.search(rf"\b{re.escape(c['name'].lower())}\b", query_clean) for c in COURSES):
@@ -84,14 +59,12 @@ def get_local_response(query):
             course_name = course["name"].lower()
             course_interests = [i.lower() for i in course.get("interests", [])]
             
-            # Match by name or interest (whole words only)
             name_match = re.search(rf"\b{re.escape(course_name)}\b", query_clean)
             interest_match = any(re.search(rf"\b{re.escape(interest)}\b", query_clean) for interest in course_interests)
             
             if name_match or interest_match:
                 matched_courses.append(course)
         
-        # If no specific course interest matched but "courses" was asked, show all
         if not matched_courses and has_course_context:
             matched_courses = COURSES
             
@@ -106,10 +79,8 @@ def get_local_response(query):
     policy_keywords = ["policy", "rule", "attendance", "appointment", "schedule", "timing", "admission"]
     for policy in POLICIES:
         topic = policy["topic"].lower()
-        # Handle optional pluralization in topic for better matching (e.g. Appointment -> Appointments)
         topic_pattern = rf"\b{re.escape(topic.rstrip('s'))}s?\b"
         
-        # More flexible policy matching: topic keyword or policy keyword + topic word
         if re.search(topic_pattern, query_clean) or \
            (any(re.search(rf"\b{re.escape(k)}\b", query_clean) for k in policy_keywords) and \
             any(re.search(rf"\b{re.escape(word.rstrip('s'))}s?\b", query_clean) for word in topic.split())):
@@ -135,4 +106,3 @@ GUIDELINES:
 3. Suggest courses from the KNOWLEDGE BASE only when they align with the student's expressed interests or when the user asks for options.
 4. Offer to book an academic advising appointment (9 AM - 5 PM, Mon-Fri) if the student shows interest in specific programs or needs professional guidance.
 """
-

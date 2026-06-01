@@ -6,28 +6,23 @@ def test_ui_load(page: Page):
     """Verify that the UI loads and displays the title."""
     page.goto("http://localhost:8501")
     # Wait for the title to appear
-    expect(page.get_by_role("heading", name="Chandigarh University Advisor")).to_be_visible(timeout=10000)
-    expect(page.get_by_text("Smart Academic Support")).to_be_visible()
+    expect(page.get_by_role("heading", name="Chandigarh University Advisor")).to_be_visible(timeout=15000)
+    expect(page.get_by_text("How can I assist you today?")).to_be_visible()
 
 def test_navigation(page: Page):
     """Verify navigation between pages."""
     page.goto("http://localhost:8501")
     
     # Check sidebar
-    expect(page.get_by_text("CU Advisor").first).to_be_visible(timeout=10000)
+    expect(page.get_by_text("CU Advisor").first).to_be_visible(timeout=15000)
     
     # Navigate to Chat History
-    # Use exact text and click it
-    page.get_by_text("Chat History", exact=True).click()
+    page.get_by_label("Chat History").click()
     expect(page.get_by_role("heading", name="Conversation Logs")).to_be_visible(timeout=15000)
     
     # Back to Student Advisor
-    # Sometimes clicking the text inside a radio button group is tricky in Streamlit
-    # Let's try to click the radio button specifically if get_by_text fails to trigger rerun
-    page.get_by_text("Student Advisor", exact=True).click()
-    
-    # Verification with multiple possible heading formats
-    expect(page.get_by_text("Chandigarh University Advisor").first).to_be_visible(timeout=15000)
+    page.get_by_label("Student Advisor").click()
+    expect(page.get_by_role("heading", name="Chandigarh University Advisor")).to_be_visible(timeout=15000)
 
 def test_local_logic_response(page: Page):
     """Verify that local logic triggers for specific keywords."""

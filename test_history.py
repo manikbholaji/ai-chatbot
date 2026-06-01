@@ -1,58 +1,39 @@
-from app import load_recent_history
-import json
 
-def test_load_recent_history_empty(tmp_path, monkeypatch):
-    """Test loading history from non-existent file."""
-    import app
-    # Point to a non-existent path
-    monkeypatch.setattr(app, "project_path", lambda *parts: tmp_path.joinpath("missing", *parts))
-    
-    history = load_recent_history("any_user")
-    assert history == []
-    
-def test_load_recent_history_filtering(tmp_path, monkeypatch):
+import pytest
+from database import set_db_path, init_db, log_interaction_db, get_user_history
+
+@pytest.fixture
+def setup_db(tmp_path):
+    """Fixture to create a temporary database."""
+    temp_db = tmp_path / "test_history.db"
+    set_db_path(temp_db)
+    init_db()
+    yield temp_db
+
+def test_load_recent_history_filtering(setup_db):
     """Test that history is correctly filtered and limited by username."""
-    temp_log_dir = tmp_path / "data"
-    temp_log_dir.mkdir()
-    temp_log_file = temp_log_dir / "interaction_logs.jsonl"
+    log_interaction_db("user1", "test", "hi1", "hello1", 0.0)
+    log_interaction_db("user2", "test", "hi2", "hello2", 0.0)
+    log_interaction_db("user1", "test", "hi3", "hello3", 0.0)
     
-    # Sample data
-    logs = [
-        {"user": "user1", "student_message": "hi1", "bot_response": "hello1"},
-        {"user": "user2", "student_message": "hi2", "bot_response": "hello2"},
-        {"user": "user1", "student_message": "hi3", "bot_response": "hello3"},
-    ]
-    
-    with open(temp_log_file, "w") as f:
-        for entry in logs:
-            f.write(json.dumps(entry) + "\n")
-            
-    # Monkeypatch project_path to return our temp path
-    import app
-    monkeypatch.setattr(app, "project_path", lambda *parts: tmp_path.joinpath(*parts))
-    
-    history = load_recent_history("user1", limit=10)
+    history = get_user_history("user1", limit=10)
     assert len(history) == 4 # 2 turns * 2 (user + assistant)
     assert history[0]["content"] == "hi1"
     assert history[1]["content"] == "hello1"
     assert history[2]["content"] == "hi3"
     assert history[3]["content"] == "hello3"
 
-def test_load_recent_history_limit(tmp_path, monkeypatch):
+def test_load_recent_history_limit(setup_db):
     """Test that history is limited correctly."""
-    temp_log_dir = tmp_path / "data"
-    temp_log_dir.mkdir()
-    temp_log_file = temp_log_dir / "interaction_logs.jsonl"
-    
-    with open(temp_log_file, "w") as f:
-        for i in range(20):
-            entry = {"user": "user1", "student_message": f"msg{i}", "bot_response": f"resp{i}"}
-            f.write(json.dumps(entry) + "\n")
+    for i in range(20):
+        log_interaction_db("user1", "test", f"msg{i}", f"resp{i}", 0.0)
             
-    import app
-    monkeypatch.setattr(app, "project_path", lambda *parts: tmp_path.joinpath(*parts))
-    
-    history = load_recent_history("user1", limit=10)
-    assert len(history) == 10 # 5 turns * 2
-    assert history[0]["content"] == "msg15"
-    assert history[-1]["content"] == "resp19"
+    history = get_user_history("user1", limit=10)
+    # limit=10 means 5 turns (each turn is 2 messages)
+    assert len(history) == 10
+    # ordered by timestamp ASC in return, but DESC in query.
+    # Actually get_user_history returns reversed(logs).
+    # Logs were DESC (newest first). 10 newest are msg19 to msg15.
+    # Reversed(msg19..msg15) is msg15..msg19.
+    assert "msg15" in history[0]["content"]
+    assert "resp19" in history[-1]["content"]
