@@ -33,5 +33,7 @@ jobs:
         ruff check .
         
     - name: Test with pytest
+      env:
+        TESTING: "true"
       run: |
         pytest
