@@ -81,6 +81,40 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=Engine)
 
 def init_db():
     Base.metadata.create_all(bind=Engine)
+    
+    # Pre-populate with default data if empty
+    db = SessionLocal()
+    if db.query(Course).count() == 0:
+        default_courses = [
+            Course(id="mca", name="Master of Computer Applications", department="Computer Applications", 
+                   description="A professional master's degree in computer science.", 
+                   interests="coding,software,apps,it", duration="2 Years"),
+            Course(id="bca", name="Bachelor of Computer Applications", department="Computer Applications", 
+                   description="Foundational undergraduate degree in computing.", 
+                   interests="computers,programming,web", duration="3 Years"),
+            Course(id="be_cse", name="BE Computer Science Engineering", department="Engineering", 
+                   description="Premier engineering program for software development.", 
+                   interests="engineering,logic,hardware,ai", duration="4 Years"),
+            Course(id="mba", name="Master of Business Administration", department="Management", 
+                   description="Advanced degree for leadership and business strategy.", 
+                   interests="business,management,leadership", duration="2 Years")
+        ]
+        db.add_all(default_courses)
+    
+    if db.query(Policy).count() == 0:
+        default_policies = [
+            Policy(topic="Attendance", description="Students must maintain 75% attendance to be eligible for final examinations."),
+            Policy(topic="Grading", description="Evaluation is based on a CGPA system with internal assessments and end-term exams."),
+            Policy(topic="Admissions", description="Admissions are based on merit and CU-CET entrance examination results."),
+            Policy(topic="Appointments", description="Academic advising is available Mon-Fri, 9 AM to 5 PM via the online portal.")
+        ]
+        db.add_all(default_policies)
+    
+    db.commit()
+    db.close()
+
+# Auto-initialize database on import
+init_db()
 
 # --- HELPER FUNCTIONS ---
 

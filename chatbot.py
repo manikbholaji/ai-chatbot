@@ -6,17 +6,33 @@ import json
 import re
 from database import get_courses_db, get_policies_db, add_appointment_db
 
-# Load Knowledge Base from SQLite
+# Load Knowledge Base from RDBMS
 def load_data():
-    courses = get_courses_db()
-    policies = get_policies_db()
-    
-    # Format courses to include list of interests
-    for c in courses:
-        if isinstance(c['interests'], str):
-            c['interests'] = c['interests'].split(",") if c['interests'] else []
-            
-    return courses, policies
+    try:
+        courses = get_courses_db()
+        policies = get_policies_db()
+        
+        # Fallback to static data if DB is empty but accessible
+        if not courses:
+            courses = [
+                {"id": "mca", "name": "Master of Computer Applications", "description": "Professional Master's", "interests": "coding,software", "duration": "2 Years"},
+                {"id": "be_cse", "name": "BE Computer Science", "description": "Engineering Degree", "interests": "logic,programming", "duration": "4 Years"}
+            ]
+        if not policies:
+            policies = [{"topic": "Attendance", "description": "75% required."}]
+
+        # Format courses to include list of interests
+        for c in courses:
+            if isinstance(c.get('interests'), str):
+                c['interests'] = c['interests'].split(",") if c['interests'] else []
+                
+        return courses, policies
+    except Exception as e:
+        # Emergency static fallback for deployment stability
+        print(f"Database loading failed: {str(e)}. Using static fallback.")
+        return [
+            {"id": "mca", "name": "Master of Computer Applications", "description": "Professional Master's", "interests": ["coding", "software"], "duration": "2 Years"}
+        ], [{"topic": "Attendance", "description": "75% required."}]
 
 COURSES, POLICIES = load_data()
 
