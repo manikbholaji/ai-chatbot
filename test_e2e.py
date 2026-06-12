@@ -75,7 +75,7 @@ def test_ai_mode_trigger(page: Page):
     # Sometimes "Thinking..." is very brief
     try:
         expect(page.get_by_text("Thinking...")).to_be_visible(timeout=2000)
-    except:
+    except Exception:
         pass # It might have already moved to response
     
     # Check for AI response content
