@@ -90,7 +90,52 @@ def get_local_response(query):
                 "directly with the core curriculum and career outcomes of Chandigarh University's programs. "
                 "I look for specific keywords in your messages to suggest the most relevant academic paths.")
 
-    # 1. Search for courses (Improved matching with word boundaries)
+    # 1. Search for policies (Improved matching)
+    policy_keywords = ["policy", "rule", "attendance", "appointment", "schedule", "timing", "admission", "criteria"]
+    for policy in POLICIES:
+        topic = policy["topic"].lower()
+        
+        # Safe singularization (avoid stripping 'ss' like 'class' -> 'cla')
+        def get_singular(w):
+            if w.endswith('ss'):
+                return w
+            if w.endswith('s') and len(w) > 1:
+                return w[:-1]
+            return w
+
+        topic_singular = get_singular(topic)
+        topic_pattern = rf"\b{re.escape(topic_singular)}s?\b"
+        
+        has_topic_match = re.search(topic_pattern, query_clean) is not None
+        
+        has_keyword_match = False
+        if any(re.search(rf"\b{re.escape(k)}\b", query_clean) for k in policy_keywords):
+            topic_words = [get_singular(w) for w in topic.split()]
+            if any(re.search(rf"\b{re.escape(word)}s?\b", query_clean) for word in topic_words):
+                has_keyword_match = True
+
+        if has_topic_match or has_keyword_match:
+            return f"According to CU Policy on **{policy['topic']}**:\n\n{policy['description']}"
+
+    # 2. Search for courses (with strict intent checking)
+    academic_intents = [
+        "course", "program", "degree", "study", "major", "recommend", "learn", "career", "class", 
+        "admission", "department", "offer", "btech", "mca", "bca", "mba", "bsc", "llb", "b.des", 
+        "b.sc", "b.a", "master", "bachelor", "interest", "interested", "looking for", "want to", "suggest"
+    ]
+    
+    has_academic_intent = any(re.search(rf"\b{re.escape(intent)}\b", query_clean) for intent in academic_intents)
+    
+    # Check if a course name is mentioned directly
+    has_direct_course_name = False
+    for course in COURSES:
+        if re.search(rf"\b{re.escape(course['name'].lower())}\b", query_clean):
+            has_direct_course_name = True
+            break
+            
+    if not (has_academic_intent or has_direct_course_name):
+        return None
+
     matched_courses = []
     for course in COURSES:
         course_name = course["name"].lower()
@@ -112,37 +157,6 @@ def get_local_response(query):
             response += f"- **{c['name']}**: {c['description']} (Duration: {c['duration']})\n"
         response += "\nWould you like me to book an academic advising appointment to discuss these further?"
         return response
-    
-
-
-    # 2. Search for policies (Improved matching)
-    policy_keywords = ["policy", "rule", "attendance", "appointment", "schedule", "timing", "admission", "criteria"]
-    for policy in POLICIES:
-        topic = policy["topic"].lower()
-        
-        # Safe singularization (avoid stripping 'ss' like 'class' -> 'cla')
-        def get_singular(w):
-            if w.endswith('ss'):
-                return w
-            if w.endswith('s') and len(w) > 1:
-                return w[:-1]
-            return w
-
-        topic_singular = get_singular(topic)
-        topic_pattern = rf"\b{re.escape(topic_singular)}s?\b"
-        
-        # Check topic name or description keyword match
-        has_topic_match = re.search(topic_pattern, query_clean) is not None
-        
-        has_keyword_match = False
-        if any(re.search(rf"\b{re.escape(k)}\b", query_clean) for k in policy_keywords):
-            # Check if any words in the policy topic match query
-            topic_words = [get_singular(w) for w in topic.split()]
-            if any(re.search(rf"\b{re.escape(word)}s?\b", query_clean) for word in topic_words):
-                has_keyword_match = True
-
-        if has_topic_match or has_keyword_match:
-            return f"According to CU Policy on **{policy['topic']}**:\n\n{policy['description']}"
 
     return None
 
