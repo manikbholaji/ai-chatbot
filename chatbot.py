@@ -34,6 +34,19 @@ def load_data():
 
 COURSES, POLICIES = load_data()
 
+# Enhanced Course List for MCA Project Perfection
+EXTRA_COURSES = [
+    {"id": "msc_ds", "name": "MSc Data Science", "description": "Advanced analytics and machine learning program.", "interests": ["data", "ai", "math", "statistics"], "duration": "2 Years"},
+    {"id": "be_me", "name": "BE Mechanical Engineering", "description": "Study of machines, design, and manufacturing.", "interests": ["physics", "machines", "design"], "duration": "4 Years"},
+    {"id": "b_arch", "name": "Bachelor of Architecture", "description": "Design and construction of buildings.", "interests": ["design", "art", "drawing", "construction"], "duration": "5 Years"},
+    {"id": "llb", "name": "Bachelor of Laws (LLB)", "description": "Professional degree in law and legal studies.", "interests": ["law", "politics", "debate"], "duration": "3 Years"}
+]
+
+# Merge with DB courses if not already present
+for ec in EXTRA_COURSES:
+    if not any(c['id'] == ec['id'] for c in COURSES):
+        COURSES.append(ec)
+
 def book_appointment(date, time, student_name, course_name):
     """
     Books an appointment for a student within standard working hours (9 AM - 5 PM, Mon-Fri).
@@ -64,46 +77,51 @@ def get_local_response(query):
                 "I look for specific keywords in your messages to suggest the most relevant academic paths.")
 
     # 1. Search for courses (Improved matching with word boundaries)
-    course_keywords = ["course", "degree", "study", "program", "admission", "department"]
+    course_keywords = ["course", "degree", "study", "program", "admission", "department", "suggest", "recommend"]
     has_course_context = any(re.search(rf"\b{re.escape(k)}s?\b", query_clean) for k in course_keywords)
     
-    if has_course_context or any(re.search(rf"\b{re.escape(c['name'].lower())}\b", query_clean) for c in COURSES):
-        matched_courses = []
-        for course in COURSES:
-            course_name = course["name"].lower()
-            course_interests = [i.lower() for i in course.get("interests", [])]
-            
-            name_match = re.search(rf"\b{re.escape(course_name)}\b", query_clean)
-            interest_match = any(re.search(rf"\b{re.escape(interest)}\b", query_clean) for interest in course_interests)
-            
-            if name_match or interest_match:
-                matched_courses.append(course)
+    matched_courses = []
+    for course in COURSES:
+        course_name = course["name"].lower()
+        # Handle both string (from DB) and list (from fallback/extra) interests
+        interests_raw = course.get("interests", [])
+        if isinstance(interests_raw, str):
+            course_interests = [i.strip().lower() for i in interests_raw.split(",")]
+        else:
+            course_interests = [i.lower() for i in interests_raw]
         
-        if not matched_courses and has_course_context:
-            matched_courses = COURSES
-            
-        if matched_courses:
-            response = "Based on your interests, I recommend the following courses at Chandigarh University:\n\n"
-            for c in matched_courses:
-                response += f"- **{c['name']}**: {c['description']} (Duration: {c['duration']})\n"
-            response += "\nWould you like me to book an academic advising appointment to discuss these further?"
-            return response
+        name_match = re.search(rf"\b{re.escape(course_name)}\b", query_clean)
+        interest_match = any(re.search(rf"\b{re.escape(interest)}\b", query_clean) for interest in course_interests)
+        
+        if name_match or interest_match:
+            matched_courses.append(course)
+    
+    if matched_courses:
+        response = "Based on your interests, I recommend the following courses at Chandigarh University:\n\n"
+        for c in matched_courses[:5]: # Limit to top 5 for better UI
+            response += f"- **{c['name']}**: {c['description']} (Duration: {c['duration']})\n"
+        response += "\nWould you like me to book an academic advising appointment to discuss these further?"
+        return response
+    
+    if has_course_context:
+        # If they asked about courses but nothing matched, give a general overview
+        response = "Chandigarh University offers a wide range of programs in Engineering, Management, Computer Applications, and more. Some popular options include:\n\n"
+        for c in COURSES[:3]:
+            response += f"- **{c['name']}**: {c['description']}\n"
+        response += "\nCould you tell me more about your interests (e.g., coding, business, art) so I can provide a better recommendation?"
+        return response
 
     # 2. Search for policies (Improved matching)
-    policy_keywords = ["policy", "rule", "attendance", "appointment", "schedule", "timing", "admission"]
+    policy_keywords = ["policy", "rule", "attendance", "appointment", "schedule", "timing", "admission", "criteria"]
     for policy in POLICIES:
         topic = policy["topic"].lower()
+        # Match topic name or keywords in description
         topic_pattern = rf"\b{re.escape(topic.rstrip('s'))}s?\b"
         
         if re.search(topic_pattern, query_clean) or \
            (any(re.search(rf"\b{re.escape(k)}\b", query_clean) for k in policy_keywords) and \
             any(re.search(rf"\b{re.escape(word.rstrip('s'))}s?\b", query_clean) for word in topic.split())):
-            return f"According to CU Policy on {policy['topic']}: {policy['description']}"
-
-    # 3. Direct Greeting/Identity
-    greetings = ["hi", "hello", "hey", "who are you", "what can you do"]
-    if any(query_clean == g for g in greetings) or (re.search(r"\bhelp\b", query_clean) and len(query_clean) < 10):
-        return "Hello! I am your CU Academic Advisor. I can help you with course information, university policies, and booking appointments. How can I assist you today?"
+            return f"According to CU Policy on **{policy['topic']}**:\n\n{policy['description']}"
 
     return None
 

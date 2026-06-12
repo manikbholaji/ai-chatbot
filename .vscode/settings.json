@@ -1,0 +1,17 @@
+{
+    "files.exclude": {
+        "**/.git": true,
+        "**/.svn": true,
+        "**/.hg": true,
+        "**/.DS_Store": true,
+        "**/Thumbs.db": true,
+        "**/c:\\Users\\PB915\\Downloads\\LaTeX Files\\Punjabi.aux": true,
+        "**/c:\\Users\\PB915\\Downloads\\LaTeX Files\\Punjabi.log": true,
+        "**/c:\\Users\\PB915\\Downloads\\LaTeX Files\\Punjabi.gz": true,
+        "**/c:\\Users\\PB915\\Downloads\\LaTeX Files\\Punjabi.out": true
+    },
+    "latex-workshop.view.pdf.viewer": "tab",
+    "latex-workshop.view.pdf.external.viewer.command": "code",
+    "latex-workshop.latex.autoBuild.run": "onFileChange",
+    "latex-workshop.view.pdf.viewInTabSelect": true
+}

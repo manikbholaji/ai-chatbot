@@ -2,6 +2,7 @@
 import streamlit as st
 from pathlib import Path
 import pandas as pd
+import plotly.express as px
 from textblob import TextBlob
 from chatbot import get_local_response, SYSTEM_PROMPT, book_appointment
 from puter_bridge import puter_bridge
@@ -18,27 +19,46 @@ BASE_DIR = Path(__file__).resolve().parent
 def log_interaction(message, response, sentiment, mode):
     user_name = st.session_state.user['name'] if st.session_state.user else "Anonymous"
     log_interaction_db(user_name, mode, message, response, sentiment)
+
 st.set_page_config(page_title="CU AI Advisor", layout="wide", page_icon="🎓")
 
-# Professional UI Styling (Clean & Modern)
+# Professional UI Styling (Refined for MCA Project)
 st.markdown("""
     <style>
     /* Main Layout */
-    .block-container { padding-top: 2rem !important; padding-bottom: 0rem !important; }
-    .main { background-color: #fcfcfc; }
+    .block-container { padding-top: 2rem !important; padding-bottom: 2rem !important; }
+    .main { background: linear-gradient(180deg, #f8f9fa 0%, #ffffff 100%); }
     
     /* Typography & Buttons */
-    h1, h2, h3 { color: #1e1e1e; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-    .stButton > button { border-radius: 8px; font-weight: 500; transition: all 0.2s ease; }
-    .stButton > button:hover { transform: translateY(-1px); box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+    h1, h2, h3 { color: #1e1e1e; font-family: 'Inter', 'Segoe UI', sans-serif; font-weight: 700; }
+    .stButton > button { 
+        border-radius: 10px; 
+        font-weight: 600; 
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1px solid #e0e0e0;
+    }
+    .stButton > button:hover { 
+        transform: translateY(-2px); 
+        box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+        border-color: #4285F4;
+    }
     
     /* Chat Aesthetics */
-    .stChatMessage { border-radius: 12px; margin-bottom: 0.5rem !important; }
-    .stChatFloatingInputContainer { padding-bottom: 30px; }
+    .stChatMessage { border-radius: 15px; border: 1px solid #f0f0f0; margin-bottom: 0.8rem !important; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+    .stChatFloatingInputContainer { padding-bottom: 40px; }
     
     /* Sidebar Polish */
-    section[data-testid="stSidebar"] { background-color: #f1f3f6; }
-    .sidebar-content { padding: 1.5rem; }
+    section[data-testid="stSidebar"] { background-color: #ffffff; border-right: 1px solid #eee; }
+    .sidebar-content { padding: 2rem; }
+    
+    /* Custom Components */
+    .metric-card {
+        background: white;
+        padding: 20px;
+        border-radius: 12px;
+        border: 1px solid #eee;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    }
     </style>
     """, unsafe_allow_html=True)
 
@@ -73,16 +93,23 @@ def authenticate(username, password):
 st.sidebar.title("🎓 CU Advisor")
 
 with st.sidebar:
-    st.markdown("### 🔐 User Account")
+    st.markdown("### 🔐 Account")
     
     if st.session_state.authenticated:
-        st.success(f"Welcome, **{st.session_state.user['name']}**")
-        st.caption(f"Role: {st.session_state.user['role'].title()}")
-        if st.button("Logout", use_container_width=True):
-            st.session_state.authenticated = False
-            st.session_state.user = None
-            st.session_state.messages = []
-            st.rerun()
+        st.success(f"**{st.session_state.user['name']}**")
+        st.caption(f"Role: {st.session_state.user['role'].upper()}")
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("Logout", use_container_width=True):
+                st.session_state.authenticated = False
+                st.session_state.user = None
+                st.session_state.messages = []
+                st.rerun()
+        with col2:
+            if st.button("🗑️ Clear", use_container_width=True, help="Clear current chat context"):
+                st.session_state.messages = []
+                st.rerun()
     else:
         auth_tab1, auth_tab2 = st.tabs(["Login", "Sign Up"])
         
@@ -113,6 +140,11 @@ with st.sidebar:
                             st.success(msg)
                         else:
                             st.error(msg)
+    
+    if not st.session_state.authenticated:
+        if st.button("🗑️ Clear Chat", use_container_width=True):
+            st.session_state.messages = []
+            st.rerun()
 
     st.caption("✅ Mode: " + ("Personalized" if st.session_state.authenticated else "Anonymous"))
 
@@ -286,11 +318,33 @@ elif st.session_state.page == "Admin Dashboard":
     if logs:
         df = pd.DataFrame(logs)
         df['timestamp'] = pd.to_datetime(df['timestamp'])
-        m1, m2 = st.columns(2)
+        
+        # Top Metrics
+        m1, m2, m3 = st.columns(3)
         m1.metric("Total Queries", len(df))
         m2.metric("Avg Sentiment", round(df['sentiment'].mean(), 2))
-        st.subheader("Recent Activity")
-        st.dataframe(df[['timestamp', 'user', 'mode', 'student_message', 'bot_response']], use_container_width=True)
+        m3.metric("Active Users", df['user'].nunique())
+        
+        st.divider()
+        
+        # Charts Row
+        c1, c2 = st.columns(2)
+        
+        with c1:
+            st.subheader("📈 Query Volume Over Time")
+            df_daily = df.set_index('timestamp').resample('D').count().reset_index()
+            fig_vol = px.line(df_daily, x='timestamp', y='student_message', labels={'student_message': 'Queries'},
+                              template="plotly_white", color_discrete_sequence=['#4285F4'])
+            st.plotly_chart(fig_vol, use_container_width=True)
+            
+        with c2:
+            st.subheader("😊 Sentiment Distribution")
+            fig_sent = px.histogram(df, x='sentiment', nbins=20, 
+                                    template="plotly_white", color_discrete_sequence=['#34A853'])
+            st.plotly_chart(fig_sent, use_container_width=True)
+            
+        st.subheader("📋 Interaction Logs")
+        st.dataframe(df[['timestamp', 'user', 'mode', 'student_message', 'bot_response', 'sentiment']], use_container_width=True)
     else:
         st.info("No logs collected yet.")
 
