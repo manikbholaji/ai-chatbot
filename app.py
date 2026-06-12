@@ -3,7 +3,7 @@ import streamlit as st
 from pathlib import Path
 import pandas as pd
 from textblob import TextBlob
-from chatbot import get_local_response, SYSTEM_PROMPT
+from chatbot import get_local_response, SYSTEM_PROMPT, book_appointment
 from puter_bridge import puter_bridge
 from database import (
     authenticate_user, add_user, log_interaction_db, 
@@ -53,11 +53,6 @@ if "processing" not in st.session_state:
     st.session_state.processing = False
 if "last_req_id" not in st.session_state:
     st.session_state.last_req_id = str(uuid.uuid4())
-
-# Interaction Logging (SQLite)
-def log_interaction(message, response, sentiment, mode):
-    user_name = st.session_state.user['name'] if st.session_state.user else "Anonymous"
-    log_interaction_db(user_name, mode, message, response, sentiment)
 
 def load_recent_history(username, limit=10):
     return get_user_history(username, limit)
