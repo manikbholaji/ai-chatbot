@@ -266,7 +266,15 @@ if st.session_state.page == "Student Advisor":
                             st.rerun()
                         else:
                             err_msg = result.get('message', 'Unknown error') if result else 'Unknown error'
-                            st.error(f"I'm having trouble connecting to my brain right now: {err_msg}. Please try again or ask about courses/policies!")
+                            fallback_msg = (
+                                f"I am currently operating in Local offline mode (diagnostics: {err_msg}). "
+                                "I can still assist you with course information and academic policies. "
+                                "For example, try asking: 'What courses are offered?' or 'What is the attendance policy?'"
+                            )
+                            st.markdown(fallback_msg)
+                            st.session_state.messages.append({"role": "assistant", "content": fallback_msg})
+                            log_interaction(prompt, fallback_msg, 0.0, "System-Fallback")
+                            st.rerun()
 
 # --- PAGE: BOOK APPOINTMENT ---
 elif st.session_state.page == "Book Appointment":

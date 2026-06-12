@@ -99,6 +99,13 @@ def get_engine():
 
     if db_url.startswith("postgres://"):
         db_url = db_url.replace("postgres://", "postgresql://", 1)
+
+    # Auto-append sslmode=require for Aiven PostgreSQL if not specified
+    if "postgresql://" in db_url and "sslmode" not in db_url:
+        if "?" in db_url:
+            db_url += "&sslmode=require"
+        else:
+            db_url += "?sslmode=require"
         
     try:
         # pool_pre_ping=True helps with dropped connections in cloud environments
@@ -184,55 +191,69 @@ def init_db():
                     db.add(new_admin)
 
         # 2. Default Courses
-        if db.query(Course).count() == 0:
-            default_courses = [
-                Course(id="mca", name="Master of Computer Applications", department="Computer Applications", 
-                       description="A professional master's degree in computer science.", 
-                       interests="coding,software,apps,it", duration="2 Years"),
-                Course(id="bca", name="Bachelor of Computer Applications", department="Computer Applications", 
-                       description="Foundational undergraduate degree in computing.", 
-                       interests="computers,programming,web", duration="3 Years"),
-                Course(id="be_cse", name="BE Computer Science Engineering", department="Engineering", 
-                       description="Premier engineering program for software development.", 
-                       interests="engineering,logic,hardware,ai", duration="4 Years"),
-                Course(id="mba", name="Master of Business Administration", department="Management", 
-                       description="Advanced degree for leadership and business strategy.", 
-                       interests="business,management,leadership", duration="2 Years"),
-                Course(id="msc_ds", name="MSc Data Science", department="Computer Applications", 
-                       description="Advanced analytics and machine learning program.", 
-                       interests="data,ai,math,statistics", duration="2 Years"),
-                Course(id="be_me", name="BE Mechanical Engineering", department="Engineering", 
-                       description="Study of machines, design, and manufacturing.", 
-                       interests="physics,machines,design", duration="4 Years"),
-                Course(id="b_arch", name="Bachelor of Architecture", department="Architecture", 
-                       description="Design and construction of buildings.", 
-                       interests="design,art,drawing,construction", duration="5 Years"),
-                Course(id="llb", name="Bachelor of Laws (LLB)", department="Law", 
-                       description="Professional degree in law and legal studies.", 
-                       interests="law,politics,debate", duration="3 Years"),
-                Course(id="b_des_fashion", name="Bachelor of Design (B.Des) - Fashion Design", department="Design", 
-                       description="A creative program covering fashion illustration, apparel design, styling, and garment construction.", 
-                       interests="fashion,designing,style,clothing,apparel,art", duration="4 Years"),
-                Course(id="bsc_animation", name="B.Sc in Animation, VFX and Gaming", department="Design", 
-                       description="A professional program in 3D modeling, animation, visual effects, and game development.", 
-                       interests="animation,vfx,gaming,art,design", duration="3 Years"),
-                Course(id="bsc_biotech", name="B.Sc (Hons) in Biotechnology", department="Biotechnology", 
-                       description="An interdisciplinary program exploring genetics, biochemistry, and molecular biology.", 
-                       interests="biology,biotech,science,research,medical", duration="3 Years"),
-                Course(id="ba_journalism", name="B.A. in Journalism and Mass Communication", department="Media", 
-                       description="Professional training in media reporting, news writing, TV production, and digital journalism.", 
-                       interests="journalism,media,writing,news,reporting,tv", duration="3 Years")
-            ]
-            db.add_all(default_courses)
+        default_courses = [
+            Course(id="mca", name="Master of Computer Applications", department="Computer Applications", 
+                   description="A professional master's degree in computer science.", 
+                   interests="coding,software,apps,it", duration="2 Years"),
+            Course(id="bca", name="Bachelor of Computer Applications", department="Computer Applications", 
+                   description="Foundational undergraduate degree in computing.", 
+                   interests="computers,programming,web", duration="3 Years"),
+            Course(id="be_cse", name="BE Computer Science Engineering", department="Engineering", 
+                   description="Premier engineering program for software development.", 
+                   interests="engineering,logic,hardware,ai", duration="4 Years"),
+            Course(id="mba", name="Master of Business Administration", department="Management", 
+                   description="Advanced degree for leadership and business strategy.", 
+                   interests="business,management,leadership", duration="2 Years"),
+            Course(id="msc_ds", name="MSc Data Science", department="Computer Applications", 
+                   description="Advanced analytics and machine learning program.", 
+                   interests="data,ai,math,statistics", duration="2 Years"),
+            Course(id="be_me", name="BE Mechanical Engineering", department="Engineering", 
+                   description="Study of machines, design, and manufacturing.", 
+                   interests="physics,machines,design", duration="4 Years"),
+            Course(id="b_arch", name="Bachelor of Architecture", department="Architecture", 
+                   description="Design and construction of buildings.", 
+                   interests="design,art,drawing,construction", duration="5 Years"),
+            Course(id="llb", name="Bachelor of Laws (LLB)", department="Law", 
+                   description="Professional degree in law and legal studies.", 
+                   interests="law,politics,debate", duration="3 Years"),
+            Course(id="b_des_fashion", name="Bachelor of Design (B.Des) - Fashion Design", department="Design", 
+                   description="A creative program covering fashion illustration, apparel design, styling, and garment construction.", 
+                   interests="fashion,designing,style,clothing,apparel,art", duration="4 Years"),
+            Course(id="bsc_animation", name="B.Sc in Animation, VFX and Gaming", department="Design", 
+                   description="A professional program in 3D modeling, animation, visual effects, and game development.", 
+                   interests="animation,vfx,gaming,art,design", duration="3 Years"),
+            Course(id="bsc_biotech", name="B.Sc (Hons) in Biotechnology", department="Biotechnology", 
+                   description="An interdisciplinary program exploring genetics, biochemistry, and molecular biology.", 
+                   interests="biology,biotech,science,research,medical", duration="3 Years"),
+            Course(id="ba_journalism", name="B.A. in Journalism and Mass Communication", department="Media", 
+                   description="Professional training in media reporting, news writing, TV production, and digital journalism.", 
+                   interests="journalism,media,writing,news,reporting,tv", duration="3 Years")
+        ]
         
-        if db.query(Policy).count() == 0:
-            default_policies = [
-                Policy(topic="Attendance", description="Students must maintain 75% attendance to be eligible for final examinations."),
-                Policy(topic="Grading", description="Evaluation is based on a CGPA system with internal assessments and end-term exams."),
-                Policy(topic="Admissions", description="Admissions are based on merit and CU-CET entrance examination results."),
-                Policy(topic="Appointments", description="Academic advising is available Mon-Fri, 9 AM to 5 PM via the online portal.")
-            ]
-            db.add_all(default_policies)
+        for c in default_courses:
+            existing = db.query(Course).filter(Course.id == c.id).first()
+            if not existing:
+                db.add(c)
+            else:
+                existing.name = c.name
+                existing.department = c.department
+                existing.description = c.description
+                existing.interests = c.interests
+                existing.duration = c.duration
+        
+        default_policies = [
+            Policy(topic="Attendance", description="Students must maintain 75% attendance to be eligible for final examinations."),
+            Policy(topic="Grading", description="Evaluation is based on a CGPA system with internal assessments and end-term exams."),
+            Policy(topic="Admissions", description="Admissions are based on merit and CU-CET entrance examination results."),
+            Policy(topic="Appointments", description="Academic advising is available Mon-Fri, 9 AM to 5 PM via the online portal.")
+        ]
+        
+        for p in default_policies:
+            existing = db.query(Policy).filter(Policy.topic == p.topic).first()
+            if not existing:
+                db.add(p)
+            else:
+                existing.description = p.description
         
         db.commit()
         db.close()
