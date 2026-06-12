@@ -66,18 +66,20 @@ def get_engine():
         return create_engine("sqlite:///:memory:")
 
     # 2. Production / Local development logic
+    db_url = None
     try:
-        db_config = st.secrets.get("database")
-    except StreamlitSecretNotFoundError:
-        db_config = None
+        if "DATABASE_URL" in st.secrets:
+            db_url = st.secrets["DATABASE_URL"]
+        else:
+            db_config = st.secrets.get("database")
+            if db_config:
+                db_url = db_config.get("url")
+    except Exception:
+        pass
 
-    if not db_config:
+    if not db_url:
         local_db_path = BASE_DIR / "data" / "university.db"
         return create_engine(f"sqlite:///{local_db_path}")
-
-    db_url = db_config.get("url")
-    if not db_url:
-        raise ConnectionError("CRITICAL: 'url' key missing in Streamlit Secrets [database] section.")
     
     db_url = db_url.strip()
 
