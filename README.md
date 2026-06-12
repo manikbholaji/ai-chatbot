@@ -61,7 +61,7 @@ The objective of this project is to build an AI-powered academic advising chatbo
 - `app.py`: Main Streamlit UI and Analytics Dashboard.
 - `chatbot.py`: Core advisor logic and system prompt configuration.
 - `database.py`: Database models and interaction layer.
-- `puter_bridge/`: Client-side bridge for secure AI integration.
+- `docs/ARCHITECTURE.md`: Technical documentation of system architecture, database ER diagram, and query API flow.
 - `docs/`: Project reports, Viva guides, and presentations.
 
 ## 📊 Evaluation Parameters
