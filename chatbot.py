@@ -11,7 +11,11 @@ EXTRA_COURSES = [
     {"id": "msc_ds", "name": "MSc Data Science", "description": "Advanced analytics and machine learning program.", "interests": ["data", "ai", "math", "statistics"], "duration": "2 Years"},
     {"id": "be_me", "name": "BE Mechanical Engineering", "description": "Study of machines, design, and manufacturing.", "interests": ["physics", "machines", "design"], "duration": "4 Years"},
     {"id": "b_arch", "name": "Bachelor of Architecture", "description": "Design and construction of buildings.", "interests": ["design", "art", "drawing", "construction"], "duration": "5 Years"},
-    {"id": "llb", "name": "Bachelor of Laws (LLB)", "description": "Professional degree in law and legal studies.", "interests": ["law", "politics", "debate"], "duration": "3 Years"}
+    {"id": "llb", "name": "Bachelor of Laws (LLB)", "description": "Professional degree in law and legal studies.", "interests": ["law", "politics", "debate"], "duration": "3 Years"},
+    {"id": "b_des_fashion", "name": "Bachelor of Design (B.Des) - Fashion Design", "description": "A creative program covering fashion illustration, apparel design, styling, and garment construction.", "interests": ["fashion", "designing", "style", "clothing", "apparel", "art"], "duration": "4 Years"},
+    {"id": "bsc_animation", "name": "B.Sc in Animation, VFX and Gaming", "description": "A professional program in 3D modeling, animation, visual effects, and game development.", "interests": ["animation", "vfx", "gaming", "art", "design"], "duration": "3 Years"},
+    {"id": "bsc_biotech", "name": "B.Sc (Hons) in Biotechnology", "description": "An interdisciplinary program exploring genetics, biochemistry, and molecular biology.", "interests": ["biology", "biotech", "science", "research", "medical"], "duration": "3 Years"},
+    {"id": "ba_journalism", "name": "B.A. in Journalism and Mass Communication", "description": "Professional training in media reporting, news writing, TV production, and digital journalism.", "interests": ["journalism", "media", "writing", "news", "reporting", "tv"], "duration": "3 Years"}
 ]
 
 # Load Knowledge Base from RDBMS
@@ -87,9 +91,6 @@ def get_local_response(query):
                 "I look for specific keywords in your messages to suggest the most relevant academic paths.")
 
     # 1. Search for courses (Improved matching with word boundaries)
-    course_keywords = ["course", "degree", "study", "program", "admission", "department", "suggest", "recommend"]
-    has_course_context = any(re.search(rf"\b{re.escape(k)}s?\b", query_clean) for k in course_keywords)
-    
     matched_courses = []
     for course in COURSES:
         course_name = course["name"].lower()
@@ -112,13 +113,7 @@ def get_local_response(query):
         response += "\nWould you like me to book an academic advising appointment to discuss these further?"
         return response
     
-    if has_course_context:
-        # If they asked about courses but nothing matched, give a general overview
-        response = "Chandigarh University offers a wide range of programs in Engineering, Management, Computer Applications, and more. Some popular options include:\n\n"
-        for c in COURSES[:3]:
-            response += f"- **{c['name']}**: {c['description']}\n"
-        response += "\nCould you tell me more about your interests (e.g., coding, business, art) so I can provide a better recommendation?"
-        return response
+
 
     # 2. Search for policies (Improved matching)
     policy_keywords = ["policy", "rule", "attendance", "appointment", "schedule", "timing", "admission", "criteria"]

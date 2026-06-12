@@ -108,6 +108,14 @@ def test_course_recommendations(page: Page):
     chat_input.press("Enter")
     expect(page.get_by_text("Master of Computer Applications")).to_be_visible()
 
+def test_fashion_course_recommendations(page: Page):
+    """Verify that fashion course recommendations trigger based on user interests."""
+    page.goto("http://localhost:8501")
+    chat_input = page.get_by_placeholder("How can I help you today?")
+    chat_input.fill("tell me course for fashion designing")
+    chat_input.press("Enter")
+    expect(page.get_by_text("Fashion Design")).to_be_visible()
+
 def test_appointment_booking_flow(page: Page):
     """Verify the student appointment booking page, including validation."""
     page.goto("http://localhost:8501")
