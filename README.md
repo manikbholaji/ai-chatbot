@@ -7,22 +7,26 @@ An AI-powered academic advising chatbot using low-code tools integrated with con
 ---
 
 ## 🌟 Key Features & Improvements
-- **Hybrid AI Architecture**: Combines fast local rule-based matching for university-specific data with advanced generative AI (GPT-4o-mini) for complex queries.
+- **Hybrid AI Architecture**: Combines fast local rule-based matching with strict academic intent filtering for university-specific data, falling back to advanced generative AI (GPT-4o-mini) for complex/conversational queries.
+- **Smarter Local Interception**: Re-engineered parser prevents keyword over-matching on general queries (e.g. computer jokes) and lets them flow to the AI flawlessly.
 - **Privacy-First & Serverless**: Uses Puter.js for client-side AI processing, requiring NO backend API keys or expensive cloud compute.
+- **Resilient UI Fallback**: Outage-resilient design displays friendly advising assistant bubbles instead of red error boxes during Puter AI connection issues.
 - **Enhanced UI/UX**: Professional Streamlit interface with custom CSS, interactive quick-actions, and mobile-responsive design.
 - **Advanced Admin Dashboard**: Real-time analytics using Plotly, tracking query volume, user activity, and sentiment analysis.
-- **Comprehensive Database**: Structured SQLAlchemy ORM managing Users, Courses, Policies, Interaction Logs, and Appointments.
-- **Robust Testing**: Full suite of unit tests and Playwright E2E tests ensuring conversational accuracy and UI stability.
+- **Cloud-Ready database**: Structured SQLAlchemy ORM supporting both SQLite local fallback and Aiven PostgreSQL with automatic `sslmode=require` injection.
+- **Robust DB Seeding**: Upsert-based database initialization guarantees all 12 course offerings (including B.Des Fashion Design) are populated and up to date.
+- **Robust Testing**: Full suite of 23 unit and Playwright E2E browser tests ensuring conversational accuracy, database integrity, and UI stability.
 
 ## 🎯 Project Objectives
 The objective of this project is to build an AI-powered academic advising chatbot that provides course recommendations, academic planning suggestions, and automated appointment scheduling for Chandigarh University students.
 
-## ✅ Professional Enhancements (v2.0)
-1. **Refined Matching Logic**: Improved regex-based matching for programs and policies.
-2. **Expanded Knowledge Base**: Added more academic programs and refined policy descriptions.
-3. **Data Visualization**: Integrated Plotly charts for admin insights.
-4. **Code Quality**: Removed dead code and reorganized project structure for better maintainability.
-5. **Session Management**: Added "Clear Chat" and improved logout flows.
+## ✅ Professional Enhancements (v3.0)
+1. **Smart Intent-Based Interception**: Restructured the chatbot local routing logic to prevent false-positive keyword recommendations.
+2. **Aiven PostgreSQL SSL Support**: Programmed automatic SSL query parameter inclusion (`sslmode=require`) to resolve connection drops.
+3. **Database Upsert Migration**: Replaced naive seeding checks with full upsert capability to support complete database synchronization.
+4. **Outage Resilient UX**: Designed friendly chat fallbacks for API network connection drops.
+5. **Data Visualization**: Integrated Plotly charts for real-time admin insights.
+6. **Session & State Management**: Added "Clear Chat" and improved logout flows.
 
 ---
 
