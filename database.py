@@ -188,7 +188,31 @@ def init_db():
                        interests="engineering,logic,hardware,ai", duration="4 Years"),
                 Course(id="mba", name="Master of Business Administration", department="Management", 
                        description="Advanced degree for leadership and business strategy.", 
-                       interests="business,management,leadership", duration="2 Years")
+                       interests="business,management,leadership", duration="2 Years"),
+                Course(id="msc_ds", name="MSc Data Science", department="Computer Applications", 
+                       description="Advanced analytics and machine learning program.", 
+                       interests="data,ai,math,statistics", duration="2 Years"),
+                Course(id="be_me", name="BE Mechanical Engineering", department="Engineering", 
+                       description="Study of machines, design, and manufacturing.", 
+                       interests="physics,machines,design", duration="4 Years"),
+                Course(id="b_arch", name="Bachelor of Architecture", department="Architecture", 
+                       description="Design and construction of buildings.", 
+                       interests="design,art,drawing,construction", duration="5 Years"),
+                Course(id="llb", name="Bachelor of Laws (LLB)", department="Law", 
+                       description="Professional degree in law and legal studies.", 
+                       interests="law,politics,debate", duration="3 Years"),
+                Course(id="b_des_fashion", name="Bachelor of Design (B.Des) - Fashion Design", department="Design", 
+                       description="A creative program covering fashion illustration, apparel design, styling, and garment construction.", 
+                       interests="fashion,designing,style,clothing,apparel,art", duration="4 Years"),
+                Course(id="bsc_animation", name="B.Sc in Animation, VFX and Gaming", department="Design", 
+                       description="A professional program in 3D modeling, animation, visual effects, and game development.", 
+                       interests="animation,vfx,gaming,art,design", duration="3 Years"),
+                Course(id="bsc_biotech", name="B.Sc (Hons) in Biotechnology", department="Biotechnology", 
+                       description="An interdisciplinary program exploring genetics, biochemistry, and molecular biology.", 
+                       interests="biology,biotech,science,research,medical", duration="3 Years"),
+                Course(id="ba_journalism", name="B.A. in Journalism and Mass Communication", department="Media", 
+                       description="Professional training in media reporting, news writing, TV production, and digital journalism.", 
+                       interests="journalism,media,writing,news,reporting,tv", duration="3 Years")
             ]
             db.add_all(default_courses)
         
