@@ -1,17 +1,18 @@
-
 import streamlit as st
 from streamlit.errors import StreamlitSecretNotFoundError
 from sqlalchemy import create_engine, Column, String, Integer, Float, Text, DateTime
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import DeclarativeBase, sessionmaker
 from pathlib import Path
 from datetime import datetime
 import os
 
 BASE_DIR = Path(__file__).resolve().parent
-Base = declarative_base()
+
+class Base(DeclarativeBase):
+    pass
 
 # --- DATABASE MODELS ---
+
 
 class User(Base):
     __tablename__ = 'users'
@@ -55,6 +56,7 @@ class Appointment(Base):
 
 # --- CONNECTION MANAGEMENT ---
 
+@st.cache_resource
 def get_engine():
     """
     Returns a SQLAlchemy engine. 
@@ -63,7 +65,9 @@ def get_engine():
     """
     # 1. Check for Testing Environment (CI)
     if os.getenv("TESTING") == "true":
-        return create_engine("sqlite:///:memory:")
+        test_db_path = BASE_DIR / "data" / "test_university.db"
+        test_db_path.parent.mkdir(parents=True, exist_ok=True)
+        return create_engine(f"sqlite:///{test_db_path}", connect_args={"check_same_thread": False})
 
     # 2. Production / Local development logic
     db_url = None
@@ -79,7 +83,7 @@ def get_engine():
 
     if not db_url:
         local_db_path = BASE_DIR / "data" / "university.db"
-        return create_engine(f"sqlite:///{local_db_path}")
+        return create_engine(f"sqlite:///{local_db_path}", connect_args={"check_same_thread": False}, pool_pre_ping=True)
     
     db_url = db_url.strip()
 
@@ -218,16 +222,21 @@ def add_user(username, password_hash, role='student'):
         db.commit()
         return True, "Account created!"
     except Exception:
+        db.rollback()
         return False, "Username exists"
     finally:
         db.close()
 
 def log_interaction_db(user, mode, message, response, sentiment):
     db = get_session()
-    log = InteractionLog(user=user, mode=mode, student_message=message, bot_response=response, sentiment=sentiment)
-    db.add(log)
-    db.commit()
-    db.close()
+    try:
+        log = InteractionLog(user=user, mode=mode, student_message=message, bot_response=response, sentiment=sentiment)
+        db.add(log)
+        db.commit()
+    except Exception:
+        db.rollback()
+    finally:
+        db.close()
 
 def get_user_history(username, limit=10):
     db = get_session()
@@ -278,10 +287,15 @@ def get_policies_db():
 
 def add_appointment_db(student_name, course_name, date, time):
     db = get_session()
-    appt = Appointment(student_name=student_name, course_name=course_name, date=date, time=time)
-    db.add(appt)
-    db.commit()
-    db.close()
+    try:
+        appt = Appointment(student_name=student_name, course_name=course_name, date=date, time=time)
+        db.add(appt)
+        db.commit()
+    except Exception:
+        db.rollback()
+        raise
+    finally:
+        db.close()
 
 def get_appointments_db():
     db = get_session()

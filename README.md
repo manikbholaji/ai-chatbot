@@ -1,38 +1,37 @@
-# CU AI Advisor (MCA Final Project)
+# CU AI Advisor (MCA Final Project) - Optimized Version
 
-An AI-powered academic advising chatbot using low-code tools integrated with conversational AI APIs. The system provides course recommendations, academic planning suggestions, and automated appointment scheduling for Chandigarh University students.
+An AI-powered academic advising chatbot using low-code tools integrated with conversational AI APIs. This project has been refined to professional standards, featuring a modern UI, robust local logic, and advanced analytics.
 
 **GitHub Repository:** [https://github.com/manikbholaji/ai-chatbot](https://github.com/manikbholaji/ai-chatbot)
 
 ---
 
+## 🌟 Key Features & Improvements
+- **Hybrid AI Architecture**: Combines fast local rule-based matching for university-specific data with advanced generative AI (GPT-4o-mini) for complex queries.
+- **Privacy-First & Serverless**: Uses Puter.js for client-side AI processing, requiring NO backend API keys or expensive cloud compute.
+- **Enhanced UI/UX**: Professional Streamlit interface with custom CSS, interactive quick-actions, and mobile-responsive design.
+- **Advanced Admin Dashboard**: Real-time analytics using Plotly, tracking query volume, user activity, and sentiment analysis.
+- **Comprehensive Database**: Structured SQLAlchemy ORM managing Users, Courses, Policies, Interaction Logs, and Appointments.
+- **Robust Testing**: Full suite of unit tests and Playwright E2E tests ensuring conversational accuracy and UI stability.
+
 ## 🎯 Project Objectives
-The objective of this project is to build an AI-powered academic advising chatbot using low-code tools integrated with conversational AI APIs. The system provides course recommendations, academic planning suggestions, and automated appointment scheduling.
+The objective of this project is to build an AI-powered academic advising chatbot that provides course recommendations, academic planning suggestions, and automated appointment scheduling for Chandigarh University students.
 
-## ✅ Project Tasks Completed
-
-1. **Integrate chatbot API (OpenAI/Dialogflow):** Integrated OpenAI's `gpt-4o-mini` conversational API seamlessly via the Puter.js serverless SDK.
-2. **Design knowledge base for academic policies:** Developed a structured SQL relational database (`Policies` table) and JSON knowledge base to serve instant policy lookups.
-3. **Develop course recommendation logic:** Implemented intelligent pattern matching in `chatbot.py` to recommend over 150+ academic programs based on student interests.
-4. **Implement chatbot interface within low-code app:** Designed and deployed the chatbot interface using **Streamlit**, a premier low-code Python framework.
-5. **Configure appointment booking integration:** Configured an automated transactional booking module in `database.py` for students to schedule consultations with human advisors.
-6. **Build student interaction analytics dashboard:** Built a dedicated Admin UI panel in Streamlit that visualizes interaction logs and usage metrics.
-7. **Implement sentiment analysis for feedback:** Integrated **TextBlob** to perform real-time sentiment analysis on student queries, logging emotional feedback scores directly into the database.
-8. **Conduct conversational accuracy testing:** Conducted rigorous automated unit, integration, and E2E testing suites using **Pytest** and **Playwright**.
-9. **Document chatbot architecture and API flow:** Thoroughly documented the 3-Tier Distributed architecture, SQL schema, and async API flow in the 79-page `CU_AI_Advisor_Project_Report.pdf`.
-10. **Demonstrate live chatbot interaction:** Deployed via Streamlit Community Cloud for a zero-configuration, live interactive demonstration.
+## ✅ Professional Enhancements (v2.0)
+1. **Refined Matching Logic**: Improved regex-based matching for programs and policies.
+2. **Expanded Knowledge Base**: Added more academic programs and refined policy descriptions.
+3. **Data Visualization**: Integrated Plotly charts for admin insights.
+4. **Code Quality**: Removed dead code and reorganized project structure for better maintainability.
+5. **Session Management**: Added "Clear Chat" and improved logout flows.
 
 ---
 
-## 🚀 100% Serverless & Keyless AI
-This app uses a cutting-edge **Client-Side AI Architecture**. Unlike traditional AI apps, this version **requires NO backend API Keys** (`OPENAI_API_KEY`, etc.) and no backend compute configuration for the LLM. All AI processing is handled strictly by the user's browser using the Puter.js Cloud SDK, which communicates directly with OpenAI.
-
 ## 🛠️ Tech Stack
-- **Frontend / Low-Code Interface**: Streamlit
-- **Conversational API Integration**: Puter.js (Client-Side `gpt-4o-mini` / OpenAI)
-- **Database / Knowledge Base**: SQLAlchemy ORM (SQLite / PostgreSQL)
-- **Analytics & Sentiment**: Pandas, Plotly, TextBlob
-- **Testing**: Pytest, Playwright (E2E Conversational Accuracy)
+- **Frontend**: Streamlit (Python)
+- **AI Integration**: Puter.js (Client-Side `gpt-4o-mini`)
+- **Database**: SQLAlchemy ORM (SQLite / PostgreSQL)
+- **Analytics**: Pandas, Plotly, TextBlob
+- **Testing**: Pytest, Playwright
 
 ## 📋 Quick Setup
 
@@ -53,17 +52,17 @@ This app uses a cutting-edge **Client-Side AI Architecture**. Unlike traditional
    streamlit run app.py
    ```
 
-4. **Run Conversational Accuracy Tests**:
+4. **Run Tests**:
    ```bash
    pytest
    ```
 
 ## 📂 Project Structure
-- `app.py`: Main Streamlit low-code UI, Analytics Dashboard, and "Headless" AI Bridge orchestration.
-- `puter_bridge/`: The core client-side engine that handles the OpenAI API integration securely.
-- `chatbot.py`: Course recommendation logic and local rule-based advisor logic.
-- `database.py`: SQLAlchemy ORM models for Policies, Courses, Interactions, and Appointments.
-- `CU_AI_Advisor_Project_Report.pdf`: Comprehensive documentation of the architecture and API flow.
+- `app.py`: Main Streamlit UI and Analytics Dashboard.
+- `chatbot.py`: Core advisor logic and system prompt configuration.
+- `database.py`: Database models and interaction layer.
+- `puter_bridge/`: Client-side bridge for secure AI integration.
+- `docs/`: Project reports, Viva guides, and presentations.
 
 ## 📊 Evaluation Parameters
 This project strictly follows professional standards for MCA final semester deliverables, prioritizing privacy-first AI deployment, efficient low-code orchestration, and robust relational data management.

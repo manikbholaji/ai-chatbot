@@ -3,3 +3,5 @@ __pycache__
 .env
 data/interaction_logs.json
 data/appointments.json
+*.db
+data/*.db

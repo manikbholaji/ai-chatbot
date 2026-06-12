@@ -2,9 +2,9 @@
 import streamlit as st
 from pathlib import Path
 import pandas as pd
+import plotly.express as px
 from textblob import TextBlob
-from chatbot import get_local_response, SYSTEM_PROMPT
-from puter_bridge import puter_bridge
+from chatbot import get_local_response, SYSTEM_PROMPT, book_appointment, get_ai_response
 from database import (
     authenticate_user, add_user, log_interaction_db, 
     get_user_history, get_all_logs, get_appointments_db
@@ -14,31 +14,50 @@ import hashlib
 
 BASE_DIR = Path(__file__).resolve().parent
 
-def project_path(*parts):
-    return BASE_DIR.joinpath(*parts)
+# Interaction Logging (SQLite)
+def log_interaction(message, response, sentiment, mode):
+    user_name = st.session_state.user['name'] if st.session_state.user else "Anonymous"
+    log_interaction_db(user_name, mode, message, response, sentiment)
 
-# Page configuration
 st.set_page_config(page_title="CU AI Advisor", layout="wide", page_icon="🎓")
 
-# Professional UI Styling (Clean & Modern)
+# Professional UI Styling (Refined for MCA Project)
 st.markdown("""
     <style>
     /* Main Layout */
-    .block-container { padding-top: 2rem !important; padding-bottom: 0rem !important; }
-    .main { background-color: #fcfcfc; }
+    .block-container { padding-top: 2rem !important; padding-bottom: 2rem !important; }
+    .main { background: linear-gradient(180deg, #f8f9fa 0%, #ffffff 100%); }
     
     /* Typography & Buttons */
-    h1, h2, h3 { color: #1e1e1e; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-    .stButton > button { border-radius: 8px; font-weight: 500; transition: all 0.2s ease; }
-    .stButton > button:hover { transform: translateY(-1px); box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+    h1, h2, h3 { color: #1e1e1e; font-family: 'Inter', 'Segoe UI', sans-serif; font-weight: 700; }
+    .stButton > button { 
+        border-radius: 10px; 
+        font-weight: 600; 
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1px solid #e0e0e0;
+    }
+    .stButton > button:hover { 
+        transform: translateY(-2px); 
+        box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+        border-color: #4285F4;
+    }
     
     /* Chat Aesthetics */
-    .stChatMessage { border-radius: 12px; margin-bottom: 0.5rem !important; }
-    .stChatFloatingInputContainer { padding-bottom: 30px; }
+    .stChatMessage { border-radius: 15px; border: 1px solid #f0f0f0; margin-bottom: 0.8rem !important; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+    .stChatFloatingInputContainer { padding-bottom: 40px; }
     
     /* Sidebar Polish */
-    section[data-testid="stSidebar"] { background-color: #f1f3f6; }
-    .sidebar-content { padding: 1.5rem; }
+    section[data-testid="stSidebar"] { background-color: #ffffff; border-right: 1px solid #eee; }
+    .sidebar-content { padding: 2rem; }
+    
+    /* Custom Components */
+    div[data-testid="stMetric"] {
+        background: white;
+        padding: 16px 20px;
+        border-radius: 12px;
+        border: 1px solid #eee;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+    }
     </style>
     """, unsafe_allow_html=True)
 
@@ -53,11 +72,6 @@ if "processing" not in st.session_state:
     st.session_state.processing = False
 if "last_req_id" not in st.session_state:
     st.session_state.last_req_id = str(uuid.uuid4())
-
-# Interaction Logging (SQLite)
-def log_interaction(message, response, sentiment, mode):
-    user_name = st.session_state.user['name'] if st.session_state.user else "Anonymous"
-    log_interaction_db(user_name, mode, message, response, sentiment)
 
 def load_recent_history(username, limit=10):
     return get_user_history(username, limit)
@@ -78,16 +92,23 @@ def authenticate(username, password):
 st.sidebar.title("🎓 CU Advisor")
 
 with st.sidebar:
-    st.markdown("### 🔐 User Account")
+    st.markdown("### 🔐 Account")
     
     if st.session_state.authenticated:
-        st.success(f"Welcome, **{st.session_state.user['name']}**")
-        st.caption(f"Role: {st.session_state.user['role'].title()}")
-        if st.button("Logout", use_container_width=True):
-            st.session_state.authenticated = False
-            st.session_state.user = None
-            st.session_state.messages = []
-            st.rerun()
+        st.success(f"**{st.session_state.user['name']}**")
+        st.caption(f"Role: {st.session_state.user['role'].upper()}")
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("Logout", use_container_width=True):
+                st.session_state.authenticated = False
+                st.session_state.user = None
+                st.session_state.messages = []
+                st.rerun()
+        with col2:
+            if st.button("🗑️ Clear", use_container_width=True, help="Clear current chat context"):
+                st.session_state.messages = []
+                st.rerun()
     else:
         auth_tab1, auth_tab2 = st.tabs(["Login", "Sign Up"])
         
@@ -118,6 +139,11 @@ with st.sidebar:
                             st.success(msg)
                         else:
                             st.error(msg)
+    
+    if not st.session_state.authenticated:
+        if st.button("🗑️ Clear Chat", use_container_width=True):
+            st.session_state.messages = []
+            st.rerun()
 
     st.caption("✅ Mode: " + ("Personalized" if st.session_state.authenticated else "Anonymous"))
 
@@ -125,6 +151,8 @@ st.sidebar.markdown("---")
 
 # Navigation Menu
 pages = ["Student Advisor", "Chat History"]
+if st.session_state.authenticated:
+    pages.append("Book Appointment")
 if st.session_state.authenticated and st.session_state.user.get('role') == 'admin':
     pages.append("Admin Dashboard")
     pages.append("Appointment Management")
@@ -136,9 +164,6 @@ if st.session_state.page not in pages:
 
 nav_page = st.sidebar.radio("Navigation", pages, index=pages.index(st.session_state.page))
 st.session_state.page = nav_page
-
-# Keyless AI Driver
-ai_driver = puter_bridge(key="headless_ai_driver")
 
 # --- PAGE: STUDENT ADVISOR ---
 if st.session_state.page == "Student Advisor":
@@ -194,52 +219,70 @@ if st.session_state.page == "Student Advisor":
             with st.chat_message(message["role"]):
                 st.markdown(message["content"])
 
-    if st.session_state.processing:
-        with st.chat_message("assistant"):
-            st.info("Thinking... 🧠")
-            sys_content = SYSTEM_PROMPT
-            if st.session_state.authenticated:
-                sys_content += f"\n\nCURRENT USER CONTEXT: You are helping {st.session_state.user['name']} ({st.session_state.user['role']})."
-            
-            history = [{"role": "system", "content": sys_content}]
-            for m in st.session_state.messages:
-                history.append({"role": m["role"], "content": m["content"]})
-            
-            result = puter_bridge(
-                messages=history,
-                command="anonymous_chat",
-                request_id=st.session_state.last_req_id,
-                key=f"ai_call_{st.session_state.last_req_id}"
-            )
-            
-            if result and result.get('type') == 'ai_response':
-                if result.get('status') == 'success':
-                    resp = result.get('message', {}).get('content', "No response")
-                    st.session_state.messages.append({"role": "assistant", "content": resp})
-                    user_msg = st.session_state.messages[-2]["content"]
-                    sentiment_score = TextBlob(user_msg).sentiment.polarity
-                    log_interaction(user_msg, resp, sentiment_score, "AI-Client")
-                    st.session_state.processing = False
-                    st.session_state.last_req_id = str(uuid.uuid4())
-                    st.rerun()
-                elif result.get('status') == 'error':
-                    st.error("I'm having trouble connecting to my brain right now. Please try again or ask about courses/policies!")
-                    st.session_state.processing = False
-                    if st.button("Retry"):
-                        st.rerun()
+    prompt = st.chat_input("How can I help you today?")
+    if prompt:
+        with chat_container:
+            with st.chat_message("user"):
+                st.markdown(prompt)
+        
+        st.session_state.messages.append({"role": "user", "content": prompt})
+        
+        local = get_local_response(prompt)
+        if local:
+            with chat_container:
+                with st.chat_message("assistant"):
+                    st.markdown(local)
+            st.session_state.messages.append({"role": "assistant", "content": local})
+            log_interaction(prompt, local, TextBlob(prompt).sentiment.polarity, "Local-Logic")
+            st.rerun()
+        else:
+            with chat_container:
+                with st.chat_message("assistant"):
+                    with st.spinner("Thinking... 🧠"):
+                        sys_content = SYSTEM_PROMPT
+                        if st.session_state.authenticated:
+                            sys_content += f"\n\nCURRENT USER CONTEXT: You are helping {st.session_state.user['name']} ({st.session_state.user['role']})."
+                        
+                        history = [{"role": "system", "content": sys_content}]
+                        for m in st.session_state.messages:
+                            history.append({"role": m["role"], "content": m["content"]})
+                        
+                        result = get_ai_response(history)
+                        if result and result.get('status') == 'success':
+                            resp = result.get('content', "No response")
+                            st.markdown(resp)
+                            st.session_state.messages.append({"role": "assistant", "content": resp})
+                            log_interaction(prompt, resp, TextBlob(prompt).sentiment.polarity, "AI-Client")
+                            st.rerun()
+                        else:
+                            err_msg = result.get('message', 'Unknown error') if result else 'Unknown error'
+                            st.error(f"I'm having trouble connecting to my brain right now: {err_msg}. Please try again or ask about courses/policies!")
 
-    if not st.session_state.processing:
-        if prompt := st.chat_input("How can I help you today?"):
-            st.session_state.messages.append({"role": "user", "content": prompt})
-            local = get_local_response(prompt)
-            if local:
-                st.session_state.messages.append({"role": "assistant", "content": local})
-                log_interaction(prompt, local, TextBlob(prompt).sentiment.polarity, "Local-Logic")
-                st.rerun()
+# --- PAGE: BOOK APPOINTMENT ---
+elif st.session_state.page == "Book Appointment":
+    st.title("📅 Book Academic Advising Appointment")
+    st.write("Schedule a session with an academic advisor to discuss your course options.")
+    
+    with st.form("book_appt_form"):
+        st.write("### Appointment Details")
+        appt_date = st.date_input("Select Date")
+        appt_time = st.time_input("Select Time")
+        course_topic = st.text_input("Topic/Course of Interest", placeholder="e.g. Master of Computer Applications")
+        
+        if st.form_submit_button("Book Appointment"):
+            if not course_topic:
+                st.error("Please enter a topic or course of interest.")
             else:
-                st.session_state.processing = True
-                st.session_state.last_req_id = str(uuid.uuid4())
-                st.rerun()
+                date_str = appt_date.strftime("%Y-%m-%d")
+                time_str = appt_time.strftime("%H:%M")
+                student_name = st.session_state.user['name']
+                
+                result_msg = book_appointment(date_str, time_str, student_name, course_topic)
+                if result_msg.startswith("Success"):
+                    st.success(result_msg)
+                    st.balloons()
+                else:
+                    st.error(result_msg)
 
 # --- PAGE: CHAT HISTORY ---
 elif st.session_state.page == "Chat History":
@@ -250,12 +293,9 @@ elif st.session_state.page == "Chat History":
         u_name = st.session_state.user['name']
         history = get_user_history(u_name, limit=50)
         if history:
-            for i in range(0, len(history), 2):
-                with st.chat_message("user"): 
-                    st.write(history[i]['content'])
-                with st.chat_message("assistant"): 
-                    st.write(history[i+1]['content'])
-                st.divider()
+            for msg in history:
+                with st.chat_message(msg['role']):
+                    st.markdown(msg['content'])
         else:
             st.info("No recorded logs for this name.")
 
@@ -266,11 +306,33 @@ elif st.session_state.page == "Admin Dashboard":
     if logs:
         df = pd.DataFrame(logs)
         df['timestamp'] = pd.to_datetime(df['timestamp'])
-        m1, m2 = st.columns(2)
+        
+        # Top Metrics
+        m1, m2, m3 = st.columns(3)
         m1.metric("Total Queries", len(df))
         m2.metric("Avg Sentiment", round(df['sentiment'].mean(), 2))
-        st.subheader("Recent Activity")
-        st.dataframe(df[['timestamp', 'user', 'mode', 'student_message', 'bot_response']], use_container_width=True)
+        m3.metric("Active Users", df['user'].nunique())
+        
+        st.divider()
+        
+        # Charts Row
+        c1, c2 = st.columns(2)
+        
+        with c1:
+            st.subheader("📈 Query Volume Over Time")
+            df_daily = df.set_index('timestamp').resample('D').count().reset_index()
+            fig_vol = px.line(df_daily, x='timestamp', y='student_message', labels={'student_message': 'Queries'},
+                              template="plotly_white", color_discrete_sequence=['#4285F4'])
+            st.plotly_chart(fig_vol, use_container_width=True)
+            
+        with c2:
+            st.subheader("😊 Sentiment Distribution")
+            fig_sent = px.histogram(df, x='sentiment', nbins=20, 
+                                    template="plotly_white", color_discrete_sequence=['#34A853'])
+            st.plotly_chart(fig_sent, use_container_width=True)
+            
+        st.subheader("📋 Interaction Logs")
+        st.dataframe(df[['timestamp', 'user', 'mode', 'student_message', 'bot_response', 'sentiment']], use_container_width=True)
     else:
         st.info("No logs collected yet.")
 
