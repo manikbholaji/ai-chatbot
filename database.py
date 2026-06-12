@@ -56,15 +56,20 @@ class Appointment(Base):
 
 # --- CONNECTION MANAGEMENT ---
 
+IS_PRODUCTION_DB = False
+
 @st.cache_resource
 def get_engine():
     """
     Returns a SQLAlchemy engine. 
     Strictly uses Production PostgreSQL (via Streamlit Secrets).
-    Falls back to SQLite ONLY during automated testing.
+    Falls back to SQLite ONLY during automated testing or connection failure.
     """
+    global IS_PRODUCTION_DB
+    
     # 1. Check for Testing Environment (CI)
     if os.getenv("TESTING") == "true":
+        IS_PRODUCTION_DB = False
         test_db_path = BASE_DIR / "data" / "test_university.db"
         test_db_path.parent.mkdir(parents=True, exist_ok=True)
         return create_engine(f"sqlite:///{test_db_path}", connect_args={"check_same_thread": False})
@@ -82,6 +87,7 @@ def get_engine():
         pass
 
     if not db_url:
+        IS_PRODUCTION_DB = False
         local_db_path = BASE_DIR / "data" / "university.db"
         return create_engine(f"sqlite:///{local_db_path}", connect_args={"check_same_thread": False}, pool_pre_ping=True)
     
@@ -95,9 +101,14 @@ def get_engine():
         engine = create_engine(db_url, pool_pre_ping=True)
         with engine.connect():
             pass
+        IS_PRODUCTION_DB = True
         return engine
     except Exception as exc:
-        raise ConnectionError(f"CRITICAL: Database connection failed: {exc}") from exc
+        print(f"CRITICAL: Production database connection failed: {exc}. Falling back to local SQLite.")
+        IS_PRODUCTION_DB = False
+        local_db_path = BASE_DIR / "data" / "university.db"
+        local_db_path.parent.mkdir(parents=True, exist_ok=True)
+        return create_engine(f"sqlite:///{local_db_path}", connect_args={"check_same_thread": False}, pool_pre_ping=True)
 
 def _read_secret_section(section_name):
     try:
@@ -200,6 +211,9 @@ def init_db():
 init_db()
 
 # --- HELPER FUNCTIONS ---
+
+def is_production_db():
+    return IS_PRODUCTION_DB
 
 def get_session():
     return SessionLocal()

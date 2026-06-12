@@ -7,7 +7,8 @@ from textblob import TextBlob
 from chatbot import get_local_response, SYSTEM_PROMPT, book_appointment, get_ai_response
 from database import (
     authenticate_user, add_user, log_interaction_db, 
-    get_user_history, get_all_logs, get_appointments_db
+    get_user_history, get_all_logs, get_appointments_db,
+    is_production_db
 )
 import uuid
 import hashlib
@@ -146,6 +147,11 @@ with st.sidebar:
             st.rerun()
 
     st.caption("✅ Mode: " + ("Personalized" if st.session_state.authenticated else "Anonymous"))
+    
+    # Render DB Status Badge
+    db_status = "Production (Aiven)" if is_production_db() else "Local Fallback (SQLite)"
+    db_icon = "🟢" if is_production_db() else "🟡"
+    st.caption(f"{db_icon} Database: {db_status}")
 
 st.sidebar.markdown("---")
 
