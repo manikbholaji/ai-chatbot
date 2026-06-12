@@ -51,12 +51,12 @@ st.markdown("""
     .sidebar-content { padding: 2rem; }
     
     /* Custom Components */
-    .metric-card {
+    div[data-testid="stMetric"] {
         background: white;
-        padding: 20px;
+        padding: 16px 20px;
         border-radius: 12px;
         border: 1px solid #eee;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        box-shadow: 0 4px 6px rgba(0,0,0,0.02);
     }
     </style>
     """, unsafe_allow_html=True)
@@ -219,52 +219,44 @@ if st.session_state.page == "Student Advisor":
             with st.chat_message(message["role"]):
                 st.markdown(message["content"])
 
-    if st.session_state.processing:
-        with st.chat_message("assistant"):
-            st.info("Thinking... 🧠")
-            sys_content = SYSTEM_PROMPT
-            if st.session_state.authenticated:
-                sys_content += f"\n\nCURRENT USER CONTEXT: You are helping {st.session_state.user['name']} ({st.session_state.user['role']})."
-            
-            history = [{"role": "system", "content": sys_content}]
-            for m in st.session_state.messages:
-                history.append({"role": m["role"], "content": m["content"]})
-            
-            result = puter_bridge(
-                messages=history,
-                command="anonymous_chat",
-                request_id=st.session_state.last_req_id,
-                key=f"ai_call_{st.session_state.last_req_id}"
-            )
-            
-            if result and result.get('type') == 'ai_response':
-                if result.get('status') == 'success':
-                    resp = result.get('message', {}).get('content', "No response")
-                    st.session_state.messages.append({"role": "assistant", "content": resp})
-                    user_msg = st.session_state.messages[-2]["content"]
-                    sentiment_score = TextBlob(user_msg).sentiment.polarity
-                    log_interaction(user_msg, resp, sentiment_score, "AI-Client")
-                    st.session_state.processing = False
-                    st.session_state.last_req_id = str(uuid.uuid4())
-                    st.rerun()
-                elif result.get('status') == 'error':
-                    st.error("I'm having trouble connecting to my brain right now. Please try again or ask about courses/policies!")
-                    st.session_state.processing = False
-                    if st.button("Retry"):
-                        st.rerun()
-
-    prompt = st.chat_input("How can I help you today?", disabled=st.session_state.processing)
-    if prompt and not st.session_state.processing:
+    prompt = st.chat_input("How can I help you today?")
+    if prompt:
+        with chat_container:
+            with st.chat_message("user"):
+                st.markdown(prompt)
+        
         st.session_state.messages.append({"role": "user", "content": prompt})
+        
         local = get_local_response(prompt)
         if local:
+            with chat_container:
+                with st.chat_message("assistant"):
+                    st.markdown(local)
             st.session_state.messages.append({"role": "assistant", "content": local})
             log_interaction(prompt, local, TextBlob(prompt).sentiment.polarity, "Local-Logic")
             st.rerun()
         else:
-            st.session_state.processing = True
-            st.session_state.last_req_id = str(uuid.uuid4())
-            st.rerun()
+            with chat_container:
+                with st.chat_message("assistant"):
+                    with st.spinner("Thinking... 🧠"):
+                        sys_content = SYSTEM_PROMPT
+                        if st.session_state.authenticated:
+                            sys_content += f"\n\nCURRENT USER CONTEXT: You are helping {st.session_state.user['name']} ({st.session_state.user['role']})."
+                        
+                        history = [{"role": "system", "content": sys_content}]
+                        for m in st.session_state.messages:
+                            history.append({"role": m["role"], "content": m["content"]})
+                        
+                        result = get_ai_response(history)
+                        if result and result.get('status') == 'success':
+                            resp = result.get('content', "No response")
+                            st.markdown(resp)
+                            st.session_state.messages.append({"role": "assistant", "content": resp})
+                            log_interaction(prompt, resp, TextBlob(prompt).sentiment.polarity, "AI-Client")
+                            st.rerun()
+                        else:
+                            err_msg = result.get('message', 'Unknown error') if result else 'Unknown error'
+                            st.error(f"I'm having trouble connecting to my brain right now: {err_msg}. Please try again or ask about courses/policies!")
 
 # --- PAGE: BOOK APPOINTMENT ---
 elif st.session_state.page == "Book Appointment":
@@ -301,12 +293,9 @@ elif st.session_state.page == "Chat History":
         u_name = st.session_state.user['name']
         history = get_user_history(u_name, limit=50)
         if history:
-            for i in range(0, len(history), 2):
-                with st.chat_message("user"): 
-                    st.write(history[i]['content'])
-                with st.chat_message("assistant"): 
-                    st.write(history[i+1]['content'])
-                st.divider()
+            for msg in history:
+                with st.chat_message(msg['role']):
+                    st.markdown(msg['content'])
         else:
             st.info("No recorded logs for this name.")
 

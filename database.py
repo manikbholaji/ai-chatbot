@@ -1,17 +1,18 @@
-
 import streamlit as st
 from streamlit.errors import StreamlitSecretNotFoundError
 from sqlalchemy import create_engine, Column, String, Integer, Float, Text, DateTime
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import DeclarativeBase, sessionmaker
 from pathlib import Path
 from datetime import datetime
 import os
 
 BASE_DIR = Path(__file__).resolve().parent
-Base = declarative_base()
+
+class Base(DeclarativeBase):
+    pass
 
 # --- DATABASE MODELS ---
+
 
 class User(Base):
     __tablename__ = 'users'
@@ -64,7 +65,9 @@ def get_engine():
     """
     # 1. Check for Testing Environment (CI)
     if os.getenv("TESTING") == "true":
-        return create_engine("sqlite:///:memory:")
+        test_db_path = BASE_DIR / "data" / "test_university.db"
+        test_db_path.parent.mkdir(parents=True, exist_ok=True)
+        return create_engine(f"sqlite:///{test_db_path}", connect_args={"check_same_thread": False})
 
     # 2. Production / Local development logic
     db_url = None
@@ -80,7 +83,7 @@ def get_engine():
 
     if not db_url:
         local_db_path = BASE_DIR / "data" / "university.db"
-        return create_engine(f"sqlite:///{local_db_path}", pool_pre_ping=True)
+        return create_engine(f"sqlite:///{local_db_path}", connect_args={"check_same_thread": False}, pool_pre_ping=True)
     
     db_url = db_url.strip()
 
