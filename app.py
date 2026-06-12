@@ -4,8 +4,7 @@ from pathlib import Path
 import pandas as pd
 import plotly.express as px
 from textblob import TextBlob
-from chatbot import get_local_response, SYSTEM_PROMPT, book_appointment
-from puter_bridge import puter_bridge
+from chatbot import get_local_response, SYSTEM_PROMPT, book_appointment, get_ai_response
 from database import (
     authenticate_user, add_user, log_interaction_db, 
     get_user_history, get_all_logs, get_appointments_db

@@ -55,6 +55,7 @@ class Appointment(Base):
 
 # --- CONNECTION MANAGEMENT ---
 
+@st.cache_resource
 def get_engine():
     """
     Returns a SQLAlchemy engine. 
@@ -79,7 +80,7 @@ def get_engine():
 
     if not db_url:
         local_db_path = BASE_DIR / "data" / "university.db"
-        return create_engine(f"sqlite:///{local_db_path}")
+        return create_engine(f"sqlite:///{local_db_path}", pool_pre_ping=True)
     
     db_url = db_url.strip()
 

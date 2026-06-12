@@ -2,9 +2,11 @@
 from datetime import datetime
 import json
 import re
+import streamlit as st
 from database import get_courses_db, get_policies_db, add_appointment_db
 
 # Load Knowledge Base from RDBMS
+@st.cache_data
 def load_data():
     try:
         courses = get_courses_db()
@@ -138,3 +140,31 @@ GUIDELINES:
 3. Suggest courses from the KNOWLEDGE BASE only when they align with the student's expressed interests or when the user asks for options.
 4. Offer to book an academic advising appointment (9 AM - 5 PM, Mon-Fri) if the student shows interest in specific programs or needs professional guidance.
 """
+
+def get_ai_response(messages):
+    """
+    Calls the Puter AI API (OpenAI compatible) using the token from Streamlit secrets.
+    """
+    token = st.secrets.get("PUTER_TOKEN")
+    if not token:
+        return {"status": "error", "message": "API token missing."}
+
+    url = "https://api.puter.com/puterai/openai/v1/chat/completions"
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Content-Type": "application/json"
+    }
+    data = {
+        "model": "gpt-4o-mini",
+        "messages": messages,
+        "temperature": 0.7
+    }
+
+    try:
+        response = requests.post(url, headers=headers, json=data, timeout=30)
+        response.raise_for_status()
+        result = response.json()
+        content = result['choices'][0]['message']['content']
+        return {"status": "success", "content": content}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
