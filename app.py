@@ -8,7 +8,7 @@ from chatbot import get_local_response, SYSTEM_PROMPT, book_appointment, get_ai_
 from database import (
     authenticate_user, add_user, log_interaction_db, 
     get_user_history, get_all_logs, get_appointments_db,
-    is_production_db
+    is_production_db, get_db_error
 )
 import uuid
 import hashlib
@@ -151,7 +151,11 @@ with st.sidebar:
     # Render DB Status Badge
     db_status = "Production (Aiven)" if is_production_db() else "Local Fallback (SQLite)"
     db_icon = "🟢" if is_production_db() else "🟡"
-    st.caption(f"{db_icon} Database: {db_status}")
+    db_err = get_db_error()
+    if db_err and not is_production_db():
+        st.caption(f"{db_icon} Database: {db_status}", help=f"Diagnostics: {db_err}")
+    else:
+        st.caption(f"{db_icon} Database: {db_status}")
 
 st.sidebar.markdown("---")
 

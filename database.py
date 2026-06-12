@@ -57,6 +57,7 @@ class Appointment(Base):
 # --- CONNECTION MANAGEMENT ---
 
 IS_PRODUCTION_DB = False
+DB_CONNECTION_ERROR = None
 
 @st.cache_resource
 def get_engine():
@@ -65,11 +66,12 @@ def get_engine():
     Strictly uses Production PostgreSQL (via Streamlit Secrets).
     Falls back to SQLite ONLY during automated testing or connection failure.
     """
-    global IS_PRODUCTION_DB
+    global IS_PRODUCTION_DB, DB_CONNECTION_ERROR
     
     # 1. Check for Testing Environment (CI)
     if os.getenv("TESTING") == "true":
         IS_PRODUCTION_DB = False
+        DB_CONNECTION_ERROR = "Running in E2E Testing mode (CI)"
         test_db_path = BASE_DIR / "data" / "test_university.db"
         test_db_path.parent.mkdir(parents=True, exist_ok=True)
         return create_engine(f"sqlite:///{test_db_path}", connect_args={"check_same_thread": False})
@@ -83,11 +85,13 @@ def get_engine():
             db_config = st.secrets.get("database")
             if db_config:
                 db_url = db_config.get("url")
-    except Exception:
-        pass
+    except Exception as e:
+        DB_CONNECTION_ERROR = f"Failed to read secrets: {str(e)}"
 
     if not db_url:
         IS_PRODUCTION_DB = False
+        if DB_CONNECTION_ERROR is None:
+            DB_CONNECTION_ERROR = "DATABASE_URL not found in st.secrets"
         local_db_path = BASE_DIR / "data" / "university.db"
         return create_engine(f"sqlite:///{local_db_path}", connect_args={"check_same_thread": False}, pool_pre_ping=True)
     
@@ -102,13 +106,18 @@ def get_engine():
         with engine.connect():
             pass
         IS_PRODUCTION_DB = True
+        DB_CONNECTION_ERROR = None
         return engine
     except Exception as exc:
         print(f"CRITICAL: Production database connection failed: {exc}. Falling back to local SQLite.")
         IS_PRODUCTION_DB = False
+        DB_CONNECTION_ERROR = str(exc)
         local_db_path = BASE_DIR / "data" / "university.db"
         local_db_path.parent.mkdir(parents=True, exist_ok=True)
         return create_engine(f"sqlite:///{local_db_path}", connect_args={"check_same_thread": False}, pool_pre_ping=True)
+
+def get_db_error():
+    return DB_CONNECTION_ERROR
 
 def _read_secret_section(section_name):
     try:
