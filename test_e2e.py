@@ -42,6 +42,13 @@ def test_login_flow(page: Page):
     """Verify the login flow."""
     page.goto("http://localhost:8501")
     
+    # Logout if already logged in from previous test
+    try:
+        page.get_by_role("button", name="Logout").click(timeout=1000)
+        page.get_by_text("Login").first.wait_for(state="visible", timeout=3000)
+    except Exception:
+        pass
+    
     # Go to Sign Up
     page.get_by_text("Sign Up").first.click()
     
@@ -92,3 +99,77 @@ def test_responsive_ui(page: Page):
     page.set_viewport_size({"width": 1280, "height": 800})
     page.goto("http://localhost:8501")
     expect(page.get_by_text("CU Advisor")).to_be_visible()
+
+def test_course_recommendations(page: Page):
+    """Verify that course recommendations trigger based on user interests."""
+    page.goto("http://localhost:8501")
+    chat_input = page.get_by_placeholder("How can I help you today?")
+    chat_input.fill("suggest a coding course")
+    chat_input.press("Enter")
+    expect(page.get_by_text("Master of Computer Applications")).to_be_visible()
+
+def test_appointment_booking_flow(page: Page):
+    """Verify the student appointment booking page, including validation."""
+    page.goto("http://localhost:8501")
+    
+    # Logout if already logged in from previous test
+    try:
+        page.get_by_role("button", name="Logout").click(timeout=1000)
+        page.get_by_text("Login").first.wait_for(state="visible", timeout=3000)
+    except Exception:
+        pass
+        
+    # Sign up and login first
+    page.get_by_text("Sign Up").first.click()
+    page.get_by_label("New Username", exact=True).fill("booking_user")
+    page.get_by_label("New Password", exact=True).fill("pass123")
+    page.get_by_role("button", name="Create Account").click()
+    
+    page.get_by_text("Login").first.click()
+    page.get_by_label("Username", exact=True).fill("booking_user")
+    page.get_by_label("Password", exact=True).fill("pass123")
+    page.get_by_role("button", name="Login").click()
+    
+    # Navigate to Book Appointment
+    page.get_by_label("Navigation").get_by_text("Book Appointment").click()
+    expect(page.get_by_text("Book Academic Advising Appointment")).to_be_visible()
+    
+    # Try booking with empty course topic to trigger error
+    page.get_by_role("button", name="Book Appointment").click()
+    expect(page.get_by_text("Please enter a topic or course of interest.")).to_be_visible()
+    
+    # Fill out details and book valid session
+    page.get_by_placeholder("e.g. Master of Computer Applications").fill("MCA Advising")
+    page.get_by_role("button", name="Book Appointment").click()
+    
+    # Should show Success or Weekend/Timing validation error message cleanly
+    expect(page.get_by_text("Success").or_(page.get_by_text("Error"))).to_be_visible()
+
+def test_admin_dashboard_and_analytics(page: Page):
+    """Verify that admin dashboard loads and displays analytics correctly."""
+    page.goto("http://localhost:8501")
+    
+    # Logout if already logged in from previous test
+    try:
+        page.get_by_role("button", name="Logout").click(timeout=1000)
+        page.get_by_text("Login").first.wait_for(state="visible", timeout=3000)
+    except Exception:
+        pass
+        
+    # Login as bootstrapped admin
+    page.get_by_text("Login").first.click()
+    page.get_by_label("Username", exact=True).fill("test_admin")
+    page.get_by_label("Password", exact=True).fill("admin123")
+    page.get_by_role("button", name="Login").click()
+    
+    # Navigate to Admin Dashboard and check components
+    page.get_by_label("Navigation").get_by_text("Admin Dashboard").click()
+    expect(page.get_by_text("Advisor Analytics")).to_be_visible()
+    expect(page.get_by_text("Total Queries")).to_be_visible()
+    
+    # Plotly charts container should render
+    expect(page.locator("div[data-testid='stPlotlyChart']").first).to_be_visible(timeout=15000)
+    
+    # Navigate to Appointment Management
+    page.get_by_label("Navigation").get_by_text("Appointment Management").click()
+    expect(page.get_by_text("Appointment Management")).to_be_visible()
