@@ -14,10 +14,10 @@ import hashlib
 
 BASE_DIR = Path(__file__).resolve().parent
 
-def project_path(*parts):
-    return BASE_DIR.joinpath(*parts)
-
-# Page configuration
+# Interaction Logging (SQLite)
+def log_interaction(message, response, sentiment, mode):
+    user_name = st.session_state.user['name'] if st.session_state.user else "Anonymous"
+    log_interaction_db(user_name, mode, message, response, sentiment)
 st.set_page_config(page_title="CU AI Advisor", layout="wide", page_icon="🎓")
 
 # Professional UI Styling (Clean & Modern)
@@ -125,6 +125,8 @@ st.sidebar.markdown("---")
 
 # Navigation Menu
 pages = ["Student Advisor", "Chat History"]
+if st.session_state.authenticated:
+    pages.append("Book Appointment")
 if st.session_state.authenticated and st.session_state.user.get('role') == 'admin':
     pages.append("Admin Dashboard")
     pages.append("Appointment Management")
@@ -136,9 +138,6 @@ if st.session_state.page not in pages:
 
 nav_page = st.sidebar.radio("Navigation", pages, index=pages.index(st.session_state.page))
 st.session_state.page = nav_page
-
-# Keyless AI Driver
-ai_driver = puter_bridge(key="headless_ai_driver")
 
 # --- PAGE: STUDENT ADVISOR ---
 if st.session_state.page == "Student Advisor":
@@ -228,18 +227,44 @@ if st.session_state.page == "Student Advisor":
                     if st.button("Retry"):
                         st.rerun()
 
-    if not st.session_state.processing:
-        if prompt := st.chat_input("How can I help you today?"):
-            st.session_state.messages.append({"role": "user", "content": prompt})
-            local = get_local_response(prompt)
-            if local:
-                st.session_state.messages.append({"role": "assistant", "content": local})
-                log_interaction(prompt, local, TextBlob(prompt).sentiment.polarity, "Local-Logic")
-                st.rerun()
+    prompt = st.chat_input("How can I help you today?", disabled=st.session_state.processing)
+    if prompt and not st.session_state.processing:
+        st.session_state.messages.append({"role": "user", "content": prompt})
+        local = get_local_response(prompt)
+        if local:
+            st.session_state.messages.append({"role": "assistant", "content": local})
+            log_interaction(prompt, local, TextBlob(prompt).sentiment.polarity, "Local-Logic")
+            st.rerun()
+        else:
+            st.session_state.processing = True
+            st.session_state.last_req_id = str(uuid.uuid4())
+            st.rerun()
+
+# --- PAGE: BOOK APPOINTMENT ---
+elif st.session_state.page == "Book Appointment":
+    st.title("📅 Book Academic Advising Appointment")
+    st.write("Schedule a session with an academic advisor to discuss your course options.")
+    
+    with st.form("book_appt_form"):
+        st.write("### Appointment Details")
+        appt_date = st.date_input("Select Date")
+        appt_time = st.time_input("Select Time")
+        course_topic = st.text_input("Topic/Course of Interest", placeholder="e.g. Master of Computer Applications")
+        
+        if st.form_submit_button("Book Appointment"):
+            if not course_topic:
+                st.error("Please enter a topic or course of interest.")
             else:
-                st.session_state.processing = True
-                st.session_state.last_req_id = str(uuid.uuid4())
-                st.rerun()
+                date_str = appt_date.strftime("%Y-%m-%d")
+                time_str = appt_time.strftime("%H:%M")
+                student_name = st.session_state.user['name']
+                
+                result_msg = book_appointment(date_str, time_str, student_name, course_topic)
+                if result_msg.startswith("Success"):
+                    st.success(result_msg)
+                    st.balloons()
+                else:
+                    st.error(result_msg)
 
 # --- PAGE: CHAT HISTORY ---
 elif st.session_state.page == "Chat History":

@@ -218,16 +218,21 @@ def add_user(username, password_hash, role='student'):
         db.commit()
         return True, "Account created!"
     except Exception:
+        db.rollback()
         return False, "Username exists"
     finally:
         db.close()
 
 def log_interaction_db(user, mode, message, response, sentiment):
     db = get_session()
-    log = InteractionLog(user=user, mode=mode, student_message=message, bot_response=response, sentiment=sentiment)
-    db.add(log)
-    db.commit()
-    db.close()
+    try:
+        log = InteractionLog(user=user, mode=mode, student_message=message, bot_response=response, sentiment=sentiment)
+        db.add(log)
+        db.commit()
+    except Exception:
+        db.rollback()
+    finally:
+        db.close()
 
 def get_user_history(username, limit=10):
     db = get_session()
@@ -278,10 +283,15 @@ def get_policies_db():
 
 def add_appointment_db(student_name, course_name, date, time):
     db = get_session()
-    appt = Appointment(student_name=student_name, course_name=course_name, date=date, time=time)
-    db.add(appt)
-    db.commit()
-    db.close()
+    try:
+        appt = Appointment(student_name=student_name, course_name=course_name, date=date, time=time)
+        db.add(appt)
+        db.commit()
+    except Exception:
+        db.rollback()
+        raise
+    finally:
+        db.close()
 
 def get_appointments_db():
     db = get_session()
