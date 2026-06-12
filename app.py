@@ -101,13 +101,13 @@ with st.sidebar:
         
         col1, col2 = st.columns(2)
         with col1:
-            if st.button("Logout", use_container_width=True):
+            if st.button("Logout", width="stretch"):
                 st.session_state.authenticated = False
                 st.session_state.user = None
                 st.session_state.messages = []
                 st.rerun()
         with col2:
-            if st.button("🗑️ Clear", use_container_width=True, help="Clear current chat context"):
+            if st.button("🗑️ Clear", width="stretch", help="Clear current chat context"):
                 st.session_state.messages = []
                 st.rerun()
     else:
@@ -117,7 +117,7 @@ with st.sidebar:
             with st.form("login_form"):
                 u_in = st.text_input("Username")
                 p_in = st.text_input("Password", type="password")
-                if st.form_submit_button("Login", use_container_width=True):
+                if st.form_submit_button("Login", width="stretch"):
                     success, role = authenticate(u_in, p_in)
                     if success:
                         st.session_state.authenticated = True
@@ -131,7 +131,7 @@ with st.sidebar:
             with st.form("signup_form"):
                 new_u = st.text_input("New Username")
                 new_p = st.text_input("New Password", type="password")
-                if st.form_submit_button("Create Account", use_container_width=True):
+                if st.form_submit_button("Create Account", width="stretch"):
                     if len(new_u) < 3 or len(new_p) < 4:
                         st.warning("Too short!")
                     else:
@@ -142,7 +142,7 @@ with st.sidebar:
                             st.error(msg)
     
     if not st.session_state.authenticated:
-        if st.button("🗑️ Clear Chat", use_container_width=True):
+        if st.button("🗑️ Clear Chat", width="stretch"):
             st.session_state.messages = []
             st.rerun()
 
@@ -182,7 +182,7 @@ if st.session_state.page == "Student Advisor":
         faq_col1, faq_col2 = st.columns(2)
         
         with faq_col1:
-            if st.button("📚 What courses are offered?", use_container_width=True):
+            if st.button("📚 What courses are offered?", width="stretch"):
                 prompt = "What courses are offered at Chandigarh University?"
                 st.session_state.messages.append({"role": "user", "content": prompt})
                 local = get_local_response(prompt)
@@ -190,7 +190,7 @@ if st.session_state.page == "Student Advisor":
                     st.session_state.messages.append({"role": "assistant", "content": local})
                     log_interaction(prompt, local, TextBlob(prompt).sentiment.polarity, "FAQ-QuickAction")
                 st.rerun()
-            if st.button("🗓️ How do I book an appointment?", use_container_width=True):
+            if st.button("🗓️ How do I book an appointment?", width="stretch"):
                 prompt = "How do I book an academic advising appointment?"
                 st.session_state.messages.append({"role": "user", "content": prompt})
                 local = get_local_response(prompt)
@@ -200,7 +200,7 @@ if st.session_state.page == "Student Advisor":
                 st.rerun()
         
         with faq_col2:
-            if st.button("⚖️ What is the attendance policy?", use_container_width=True):
+            if st.button("⚖️ What is the attendance policy?", width="stretch"):
                 prompt = "Tell me about the university attendance policy."
                 st.session_state.messages.append({"role": "user", "content": prompt})
                 local = get_local_response(prompt)
@@ -208,7 +208,7 @@ if st.session_state.page == "Student Advisor":
                     st.session_state.messages.append({"role": "assistant", "content": local})
                     log_interaction(prompt, local, TextBlob(prompt).sentiment.polarity, "FAQ-QuickAction")
                 st.rerun()
-            if st.button("🤔 How do you recommend courses?", use_container_width=True):
+            if st.button("🤔 How do you recommend courses?", width="stretch"):
                 prompt = "What is your logic behind recommending courses?"
                 st.session_state.messages.append({"role": "user", "content": prompt})
                 local = get_local_response(prompt)
@@ -329,16 +329,16 @@ elif st.session_state.page == "Admin Dashboard":
             df_daily = df.set_index('timestamp').resample('D').count().reset_index()
             fig_vol = px.line(df_daily, x='timestamp', y='student_message', labels={'student_message': 'Queries'},
                               template="plotly_white", color_discrete_sequence=['#4285F4'])
-            st.plotly_chart(fig_vol, use_container_width=True)
+            st.plotly_chart(fig_vol, width="stretch")
             
         with c2:
             st.subheader("😊 Sentiment Distribution")
             fig_sent = px.histogram(df, x='sentiment', nbins=20, 
                                     template="plotly_white", color_discrete_sequence=['#34A853'])
-            st.plotly_chart(fig_sent, use_container_width=True)
+            st.plotly_chart(fig_sent, width="stretch")
             
         st.subheader("📋 Interaction Logs")
-        st.dataframe(df[['timestamp', 'user', 'mode', 'student_message', 'bot_response', 'sentiment']], use_container_width=True)
+        st.dataframe(df[['timestamp', 'user', 'mode', 'student_message', 'bot_response', 'sentiment']], width="stretch")
     else:
         st.info("No logs collected yet.")
 
