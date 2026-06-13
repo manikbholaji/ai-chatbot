@@ -46,6 +46,8 @@ def draw_arrow(g, x1, y1, x2, y2, label="", label_pos="top"):
             ly -= 10
         elif label_pos == "left":
             lx -= len(label)*3 - 5
+        elif label_pos == "right":
+            lx += len(label)*3 - 5
         g.add(String(lx, ly, label, fontName="Helvetica", fontSize=7, fillColor=COLOR_SLATE, textAnchor="middle"))
 
 def draw_stick_figure(g, x, y, label=""):
@@ -75,26 +77,26 @@ def add_header_footer_to_drawing(d, width, height, title):
 # 1. Figure 3.1: DFD Level 0 Context Diagram
 # ==========================================
 def get_dfd_level_0_drawing():
-    w, h = 468, 170
+    w, h = 468, 220
     d = Drawing(w, h)
     add_header_footer_to_drawing(d, w, h, "DFD Level 0 Context Diagram")
     
     g = Group()
     # Left Actor: Student User
-    g.add(Rect(20, 65, 90, 40, fillColor=COLOR_NAVY, strokeColor=COLOR_NAVY, rx=3, ry=3))
-    g.add(String(65, 87, "STUDENT", fontName="Helvetica-Bold", fontSize=9, fillColor=COLOR_TEXT_LIGHT, textAnchor="middle"))
-    g.add(String(65, 75, "USER", fontName="Helvetica-Bold", fontSize=9, fillColor=COLOR_TEXT_LIGHT, textAnchor="middle"))
+    g.add(Rect(20, 95, 90, 40, fillColor=COLOR_NAVY, strokeColor=COLOR_NAVY, rx=3, ry=3))
+    g.add(String(65, 117, "STUDENT", fontName="Helvetica-Bold", fontSize=9, fillColor=COLOR_TEXT_LIGHT, textAnchor="middle"))
+    g.add(String(65, 105, "USER", fontName="Helvetica-Bold", fontSize=9, fillColor=COLOR_TEXT_LIGHT, textAnchor="middle"))
     
     # Right Actor: Admin User
-    g.add(Rect(358, 65, 90, 40, fillColor=COLOR_NAVY, strokeColor=COLOR_NAVY, rx=3, ry=3))
-    g.add(String(403, 87, "ADMIN", fontName="Helvetica-Bold", fontSize=9, fillColor=COLOR_TEXT_LIGHT, textAnchor="middle"))
-    g.add(String(403, 75, "USER", fontName="Helvetica-Bold", fontSize=9, fillColor=COLOR_TEXT_LIGHT, textAnchor="middle"))
+    g.add(Rect(358, 95, 90, 40, fillColor=COLOR_NAVY, strokeColor=COLOR_NAVY, rx=3, ry=3))
+    g.add(String(403, 117, "ADMIN", fontName="Helvetica-Bold", fontSize=9, fillColor=COLOR_TEXT_LIGHT, textAnchor="middle"))
+    g.add(String(403, 105, "USER", fontName="Helvetica-Bold", fontSize=9, fillColor=COLOR_TEXT_LIGHT, textAnchor="middle"))
     
     # Center Process: System Portal
-    g.add(Circle(234, 85, 45, fillColor=COLOR_SLATE, strokeColor=COLOR_SLATE))
-    g.add(String(234, 95, "CU AI ADVISOR", fontName="Helvetica-Bold", fontSize=8, fillColor=COLOR_TEXT_LIGHT, textAnchor="middle"))
-    g.add(String(234, 85, "SYSTEM PORTAL", fontName="Helvetica-Bold", fontSize=8, fillColor=COLOR_TEXT_LIGHT, textAnchor="middle"))
-    g.add(String(234, 75, "(Process 0.0)", fontName="Helvetica", fontSize=7, fillColor=COLOR_TEXT_LIGHT, textAnchor="middle"))
+    g.add(Circle(234, 115, 45, fillColor=COLOR_SLATE, strokeColor=COLOR_SLATE))
+    g.add(String(234, 125, "CU AI ADVISOR", fontName="Helvetica-Bold", fontSize=8, fillColor=COLOR_TEXT_LIGHT, textAnchor="middle"))
+    g.add(String(234, 115, "SYSTEM PORTAL", fontName="Helvetica-Bold", fontSize=8, fillColor=COLOR_TEXT_LIGHT, textAnchor="middle"))
+    g.add(String(234, 105, "(Process 0.0)", fontName="Helvetica", fontSize=7, fillColor=COLOR_TEXT_LIGHT, textAnchor="middle"))
     
     # Bottom: External Puter AI Edge API
     g.add(Rect(154, 10, 160, 25, fillColor=COLOR_BG_LIGHT, strokeColor=COLOR_BORDER, rx=2, ry=2))
@@ -103,19 +105,19 @@ def get_dfd_level_0_drawing():
     
     # Data flow arrows
     # Student -> Center (Queries)
-    draw_arrow(g, 110, 95, 189, 95, "Queries", "top")
+    draw_arrow(g, 110, 125, 189, 125, "Queries", "top")
     # Center -> Student (Advice / Bookings)
-    draw_arrow(g, 189, 75, 110, 75, "Advice/Slots", "bottom")
+    draw_arrow(g, 189, 105, 110, 105, "Advice/Slots", "bottom")
     
     # Admin -> Center (Credentials / Configuration)
-    draw_arrow(g, 358, 95, 279, 95, "Credentials/Actions", "top")
+    draw_arrow(g, 358, 125, 279, 125, "Credentials/Actions", "top")
     # Center -> Admin (Dashboard data)
-    draw_arrow(g, 279, 75, 358, 75, "Analytics/Logs", "bottom")
+    draw_arrow(g, 279, 105, 358, 105, "Analytics/Logs", "bottom")
     
     # Center -> Puter AI
-    draw_arrow(g, 220, 40, 220, 35, "Prompt API", "left")
+    draw_arrow(g, 220, 70, 220, 35, "Prompt API", "left")
     # Puter AI -> Center
-    draw_arrow(g, 248, 35, 248, 40, "Response tokens", "right")
+    draw_arrow(g, 248, 35, 248, 70, "Response tokens", "right")
     
     d.add(g)
     return d
@@ -189,13 +191,15 @@ def get_dfd_level_1_drawing():
     # Student -> 1.0 Login
     draw_arrow(g, 70, 160, 100, 160, "Creds", "top")
     # 1.0 -> D1
-    draw_arrow(g, 80, 185, 60, 195)
+    draw_arrow(g, 106, 169, 60, 195)
     # Student -> 2.0 Chat
     draw_arrow(g, 40, 140, 102, 95, "Query", "left")
     # 2.0 -> D2/D3 (Local Match Query)
     draw_arrow(g, 135, 70, 190, 40)
     # 2.0 -> 3.0 (Fallback)
     draw_arrow(g, 140, 85, 220, 85, "No Match", "top")
+    # 3.0 -> 2.0 (Response)
+    draw_arrow(g, 220, 80, 140, 80, "Response", "bottom")
     # Student -> 4.0 Booking
     draw_arrow(g, 50, 140, 220, 145, "Book", "bottom")
     # 4.0 -> D4
@@ -443,10 +447,11 @@ def get_sequence_diagram_drawing():
         g.add(String(col, 23, names[i], fontName="Helvetica-Bold", fontSize=8, fillColor=COLOR_TEXT_LIGHT, textAnchor="middle"))
 
     # Activation blocks (vertical rects on lifelines)
-    g.add(Rect(132, 45, 6, 140, fillColor=COLOR_BORDER, strokeColor=COLOR_SLATE, strokeWidth=0.5))
-    g.add(Rect(227, 60, 6, 115, fillColor=COLOR_BORDER, strokeColor=COLOR_SLATE, strokeWidth=0.5))
-    g.add(Rect(322, 75, 6, 30, fillColor=COLOR_BORDER, strokeColor=COLOR_SLATE, strokeWidth=0.5))
-    g.add(Rect(417, 120, 6, 30, fillColor=COLOR_BORDER, strokeColor=COLOR_SLATE, strokeWidth=0.5))
+    g.add(Rect(132, 55, 6, 120, fillColor=COLOR_BORDER, strokeColor=COLOR_SLATE, strokeWidth=0.5)) # UI active: covers 55 to 175
+    g.add(Rect(227, 70, 6, 90, fillColor=COLOR_BORDER, strokeColor=COLOR_SLATE, strokeWidth=0.5))  # Controller active: covers 70 to 160
+    g.add(Rect(322, 130, 6, 15, fillColor=COLOR_BORDER, strokeColor=COLOR_SLATE, strokeWidth=0.5)) # DB check active: covers 130 to 145
+    g.add(Rect(417, 100, 6, 15, fillColor=COLOR_BORDER, strokeColor=COLOR_SLATE, strokeWidth=0.5)) # Puter AI active: covers 100 to 115
+    g.add(Rect(322, 65, 6, 10, fillColor=COLOR_BORDER, strokeColor=COLOR_SLATE, strokeWidth=0.5))  # DB write active: covers 65 to 75
 
     # Interaction Steps (Chronological y-coords from top to bottom)
     # y=175: Student -> UI (Submit Query)
@@ -526,17 +531,15 @@ def get_activity_diagram_drawing():
     draw_process(g, 408, 125, 100, 24, "Call Puter Edge AI")
     
     # Merge paths back to Logger Process
-    # Left flows -> Logger
-    g.add(Line(60, 173, 60, 70, strokeColor=COLOR_SLATE, strokeWidth=1))
-    g.add(Line(60, 113, 60, 70, strokeColor=COLOR_SLATE, strokeWidth=1))
-    draw_arrow(g, 60, 70, 184, 70)
+    # Left flows -> Route to x=5 to bypass the process boxes and avoid overlaps
+    g.add(Line(10, 185, 5, 185, strokeColor=COLOR_SLATE, strokeWidth=1)) # From Fetch Local Policy left edge
+    g.add(Line(10, 125, 5, 125, strokeColor=COLOR_SLATE, strokeWidth=1)) # From Fetch Course Details left edge
+    g.add(Line(5, 185, 5, 70, strokeColor=COLOR_SLATE, strokeWidth=1))   # Vertical bypass line
+    draw_arrow(g, 5, 70, 184, 70)                                       # Arrow to Log & Render left edge
     
     # Right flows -> Logger
     g.add(Line(408, 113, 408, 70, strokeColor=COLOR_SLATE, strokeWidth=1))
     draw_arrow(g, 408, 70, 284, 70)
-    
-    # Center NO flow -> Logger
-    draw_arrow(g, 234, 110, 234, 82)
     
     # Log & Render Process
     draw_process(g, 234, 70, 100, 24, "Log & Render Response")
