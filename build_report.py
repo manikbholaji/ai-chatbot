@@ -440,15 +440,15 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Final_Report_Manik_Bhola.pdf", page_ma
         "<b>Project Title:</b> CU AI Advisor: A Cloud-Native Serverless Academic Advising System<br/>"
         "<b>Objective:</b> To develop a 24/7 intelligent conversational agent that provides academic guidance, "
         "course recommendations, and policy lookups for Chandigarh University students.<br/>"
-        "<b>Technologies Used:</b> Python, Streamlit, SQLAlchemy, Puter.js (Client-Side AI), Aiven PostgreSQL, TextBlob.<br/>"
+        "<b>Technologies Used:</b> Python, Streamlit, SQLAlchemy, Puter completions API (Serverless AI), Aiven PostgreSQL, TextBlob.<br/>"
         "<b>Development Methodology:</b> Agile Scrum framework with a focus on iterative development and cloud-native deployment.<br/>"
         "<b>Key Results:</b> Successfully implemented a high-performance, privacy-first AI advisor that offloads compute "
-        "to the client browser, reducing university infrastructure costs to zero while maintaining a 100% data integrity "
+        "to serverless API endpoints, reducing university hardware hosting costs to zero while maintaining a 100% data integrity "
         "record across cloud-hosted relational databases.", body_style))
     story.append(Paragraph(
         "The CU AI Advisor addresses the operational challenges of scaling academic support in large institutions. By utilizing "
-        "SQLAlchemy ORM for a hybrid data layer and the Puter.js SDK for browser-based AI inference, the system ensures zero per-user "
-        "infrastructure costs. Extensive validation confirms the system's accuracy in delivering course suggestions and scheduling appointments. "
+        "SQLAlchemy ORM for a hybrid data layer and the Puter completions API for serverless AI inference, the system ensures zero per-user "
+        "infrastructure maintenance costs. Extensive validation confirms the system's accuracy in delivering course suggestions and scheduling appointments. "
         "The admin dashboard provides valuable insights through real-time student sentiment tracking and search pattern analytics.", body_style))
     story.append(PageBreak())
 
@@ -959,7 +959,7 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Final_Report_Manik_Bhola.pdf", page_ma
     references_list = [
         "1. Vaswani, A., Shazeer, N., Parmar, N., Uszkoreit, J., Jones, L., Gomez, A. N., ... & Polosukhin, I. (2017). Attention is all you need. Advances in Neural Information Processing Systems, 30.",
         "2. Streamlit Inc. (2026). Official Documentation for Reactive Python Applications. Retrieved from https://docs.streamlit.io",
-        "3. Puter Cloud SDK. (2026). Developer Guide for Client-Side Edge AI Inference. Retrieved from https://docs.puter.com",
+        "3. Puter Cloud API. (2026). Developer Guide for Serverless Cloud completions API Inference. Retrieved from https://docs.puter.com",
         "4. SQLAlchemy Core Team. (2026). Object-Relational Mappings and Schema Declarations. Retrieved from https://docs.sqlalchemy.org",
         "5. Aiven Cloud Services. (2026). Managed PostgreSQL Configuration and Connection Reliability. Retrieved from https://aiven.io/docs",
         "6. Chandigarh University. (2026). Academic Regulations and Student Code of Conduct Handbook.",
