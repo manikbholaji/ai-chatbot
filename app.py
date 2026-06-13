@@ -323,7 +323,7 @@ elif st.session_state.page == "Admin Dashboard":
     logs = get_all_logs()
     if logs:
         df = pd.DataFrame(logs)
-        df['timestamp'] = pd.to_datetime(df['timestamp'])
+        df['timestamp'] = pd.to_datetime(df['timestamp'], format='ISO8601')
         
         # Top Metrics
         m1, m2, m3 = st.columns(3)
@@ -361,9 +361,9 @@ elif st.session_state.page == "Admin Dashboard":
             pcts = {cat: (counts_dict[cat] / total * 100) if total > 0 else 0.0 for cat in cats}
             
             plot_df = pd.DataFrame([
-                {"Sentiment": f"Positive ({pcts['Positive']:.1f}%)", "Percentage": pcts['Positive'], "Category": "Positive"},
-                {"Sentiment": f"Neutral ({pcts['Neutral']:.1f}%)", "Percentage": pcts['Neutral'], "Category": "Neutral"},
-                {"Sentiment": f"Negative ({pcts['Negative']:.1f}%)", "Percentage": pcts['Negative'], "Category": "Negative"}
+                {"Sentiment": f"Positive ({int(round(pcts['Positive']))}%)", "Percentage": pcts['Positive'], "Category": "Positive"},
+                {"Sentiment": f"Neutral ({int(round(pcts['Neutral']))}%)", "Percentage": pcts['Neutral'], "Category": "Neutral"},
+                {"Sentiment": f"Negative ({int(round(pcts['Negative']))}%)", "Percentage": pcts['Negative'], "Category": "Negative"}
             ])
             
             fig_sent = px.bar(
