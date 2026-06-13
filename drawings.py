@@ -126,92 +126,91 @@ def get_dfd_level_0_drawing():
 # 2. Figure 3.2: DFD Level 1 System Data Flow Diagram
 # ==========================================
 def get_dfd_level_1_drawing():
-    w, h = 468, 225
+    w, h = 468, 220
     d = Drawing(w, h)
     add_header_footer_to_drawing(d, w, h, "DFD Level 1 System Data Flow Diagram")
     
     g = Group()
     # Entities
     # Left: Student
-    g.add(Rect(10, 140, 60, 30, fillColor=COLOR_NAVY, strokeColor=COLOR_NAVY, rx=2, ry=2))
-    g.add(String(40, 152, "STUDENT", fontName="Helvetica-Bold", fontSize=8, fillColor=COLOR_TEXT_LIGHT, textAnchor="middle"))
+    g.add(Rect(15, 95, 60, 30, fillColor=COLOR_NAVY, strokeColor=COLOR_NAVY, rx=2, ry=2))
+    g.add(String(45, 107, "STUDENT", fontName="Helvetica-Bold", fontSize=8, fillColor=COLOR_TEXT_LIGHT, textAnchor="middle"))
     
     # Right: Admin
-    g.add(Rect(398, 140, 60, 30, fillColor=COLOR_NAVY, strokeColor=COLOR_NAVY, rx=2, ry=2))
-    g.add(String(428, 152, "ADMIN", fontName="Helvetica-Bold", fontSize=8, fillColor=COLOR_TEXT_LIGHT, textAnchor="middle"))
+    g.add(Rect(393, 95, 60, 30, fillColor=COLOR_NAVY, strokeColor=COLOR_NAVY, rx=2, ry=2))
+    g.add(String(423, 107, "ADMIN", fontName="Helvetica-Bold", fontSize=8, fillColor=COLOR_TEXT_LIGHT, textAnchor="middle"))
     
-    # Processes (Circles, r=20)
-    # Process 1: Login
-    g.add(Circle(120, 155, 20, fillColor=COLOR_SLATE, strokeColor=COLOR_SLATE))
+    # Processes (Circles, r=18)
+    # Process 1: Auth
+    g.add(Circle(120, 155, 18, fillColor=COLOR_SLATE, strokeColor=COLOR_SLATE))
     g.add(String(120, 158, "1.0", fontName="Helvetica-Bold", fontSize=8, fillColor=COLOR_TEXT_LIGHT, textAnchor="middle"))
-    g.add(String(120, 148, "Login/Reg", fontName="Helvetica", fontSize=7, fillColor=COLOR_TEXT_LIGHT, textAnchor="middle"))
+    g.add(String(120, 148, "Auth", fontName="Helvetica", fontSize=7, fillColor=COLOR_TEXT_LIGHT, textAnchor="middle"))
     
     # Process 2: Chat
-    g.add(Circle(120, 85, 20, fillColor=COLOR_SLATE, strokeColor=COLOR_SLATE))
-    g.add(String(120, 88, "2.0", fontName="Helvetica-Bold", fontSize=8, fillColor=COLOR_TEXT_LIGHT, textAnchor="middle"))
-    g.add(String(120, 78, "Chat Router", fontName="Helvetica", fontSize=7, fillColor=COLOR_TEXT_LIGHT, textAnchor="middle"))
+    g.add(Circle(210, 155, 18, fillColor=COLOR_SLATE, strokeColor=COLOR_SLATE))
+    g.add(String(210, 158, "2.0", fontName="Helvetica-Bold", fontSize=8, fillColor=COLOR_TEXT_LIGHT, textAnchor="middle"))
+    g.add(String(210, 148, "Chat", fontName="Helvetica", fontSize=7, fillColor=COLOR_TEXT_LIGHT, textAnchor="middle"))
     
     # Process 3: Edge AI
-    g.add(Circle(240, 85, 20, fillColor=COLOR_SLATE, strokeColor=COLOR_SLATE))
-    g.add(String(240, 88, "3.0", fontName="Helvetica-Bold", fontSize=8, fillColor=COLOR_TEXT_LIGHT, textAnchor="middle"))
-    g.add(String(240, 78, "Edge AI", fontName="Helvetica", fontSize=7, fillColor=COLOR_TEXT_LIGHT, textAnchor="middle"))
+    g.add(Circle(300, 155, 18, fillColor=COLOR_SLATE, strokeColor=COLOR_SLATE))
+    g.add(String(300, 158, "3.0", fontName="Helvetica-Bold", fontSize=8, fillColor=COLOR_TEXT_LIGHT, textAnchor="middle"))
+    g.add(String(300, 148, "Edge AI", fontName="Helvetica", fontSize=7, fillColor=COLOR_TEXT_LIGHT, textAnchor="middle"))
     
     # Process 4: Booking
-    g.add(Circle(240, 155, 20, fillColor=COLOR_SLATE, strokeColor=COLOR_SLATE))
-    g.add(String(240, 158, "4.0", fontName="Helvetica-Bold", fontSize=8, fillColor=COLOR_TEXT_LIGHT, textAnchor="middle"))
-    g.add(String(240, 148, "Book Appt", fontName="Helvetica", fontSize=7, fillColor=COLOR_TEXT_LIGHT, textAnchor="middle"))
+    g.add(Circle(210, 65, 18, fillColor=COLOR_SLATE, strokeColor=COLOR_SLATE))
+    g.add(String(210, 68, "4.0", fontName="Helvetica-Bold", fontSize=8, fillColor=COLOR_TEXT_LIGHT, textAnchor="middle"))
+    g.add(String(210, 58, "Book", fontName="Helvetica", fontSize=7, fillColor=COLOR_TEXT_LIGHT, textAnchor="middle"))
     
     # Process 5: Analytics
-    g.add(Circle(340, 155, 20, fillColor=COLOR_SLATE, strokeColor=COLOR_SLATE))
-    g.add(String(340, 158, "5.0", fontName="Helvetica-Bold", fontSize=8, fillColor=COLOR_TEXT_LIGHT, textAnchor="middle"))
-    g.add(String(340, 148, "Analytics", fontName="Helvetica", fontSize=7, fillColor=COLOR_TEXT_LIGHT, textAnchor="middle"))
+    g.add(Circle(320, 65, 18, fillColor=COLOR_SLATE, strokeColor=COLOR_SLATE))
+    g.add(String(320, 68, "5.0", fontName="Helvetica-Bold", fontSize=8, fillColor=COLOR_TEXT_LIGHT, textAnchor="middle"))
+    g.add(String(320, 58, "Analytics", fontName="Helvetica", fontSize=7, fillColor=COLOR_TEXT_LIGHT, textAnchor="middle"))
     
-    # Data Stores (Horizontal bars top/bottom, open on right)
-    # D1: Users Table
-    g.add(Line(10, 210, 80, 210, strokeColor=COLOR_SLATE, strokeWidth=1))
-    g.add(Line(10, 195, 80, 195, strokeColor=COLOR_SLATE, strokeWidth=1))
-    g.add(String(45, 200, "D1: users", fontName="Helvetica-Bold", fontSize=7, fillColor=COLOR_SLATE, textAnchor="middle"))
+    # Data Stores
+    # D1: users
+    g.add(Line(90, 210, 150, 210, strokeColor=COLOR_SLATE, strokeWidth=1))
+    g.add(Line(90, 195, 150, 195, strokeColor=COLOR_SLATE, strokeWidth=1))
+    g.add(String(120, 200, "D1: users", fontName="Helvetica-Bold", fontSize=7, fillColor=COLOR_SLATE, textAnchor="middle"))
     
-    # D2/D3: Catalogs / Policies
-    g.add(Line(180, 40, 300, 40, strokeColor=COLOR_SLATE, strokeWidth=1))
-    g.add(Line(180, 25, 300, 25, strokeColor=COLOR_SLATE, strokeWidth=1))
-    g.add(String(240, 30, "D2/D3: courses / policies", fontName="Helvetica-Bold", fontSize=7, fillColor=COLOR_SLATE, textAnchor="middle"))
+    # D2/D3: catalogs
+    g.add(Line(180, 210, 240, 210, strokeColor=COLOR_SLATE, strokeWidth=1))
+    g.add(Line(180, 195, 240, 195, strokeColor=COLOR_SLATE, strokeWidth=1))
+    g.add(String(210, 200, "D2/D3: catalogs", fontName="Helvetica-Bold", fontSize=7, fillColor=COLOR_SLATE, textAnchor="middle"))
     
-    # D4: Appointments Table
-    g.add(Line(200, 210, 280, 210, strokeColor=COLOR_SLATE, strokeWidth=1))
-    g.add(Line(200, 195, 280, 195, strokeColor=COLOR_SLATE, strokeWidth=1))
-    g.add(String(240, 200, "D4: appointments", fontName="Helvetica-Bold", fontSize=7, fillColor=COLOR_SLATE, textAnchor="middle"))
+    # D4: appointments
+    g.add(Line(180, 25, 240, 25, strokeColor=COLOR_SLATE, strokeWidth=1))
+    g.add(Line(180, 10, 240, 10, strokeColor=COLOR_SLATE, strokeWidth=1))
+    g.add(String(210, 14, "D4: appointments", fontName="Helvetica-Bold", fontSize=7, fillColor=COLOR_SLATE, textAnchor="middle"))
     
-    # D5: Interaction Logs Table
-    g.add(Line(320, 210, 400, 210, strokeColor=COLOR_SLATE, strokeWidth=1))
-    g.add(Line(320, 195, 400, 195, strokeColor=COLOR_SLATE, strokeWidth=1))
-    g.add(String(360, 200, "D5: interaction_logs", fontName="Helvetica-Bold", fontSize=7, fillColor=COLOR_SLATE, textAnchor="middle"))
+    # D5: interaction_logs
+    g.add(Line(290, 25, 350, 25, strokeColor=COLOR_SLATE, strokeWidth=1))
+    g.add(Line(290, 10, 350, 10, strokeColor=COLOR_SLATE, strokeWidth=1))
+    g.add(String(320, 14, "D5: interaction_logs", fontName="Helvetica-Bold", fontSize=7, fillColor=COLOR_SLATE, textAnchor="middle"))
     
-    # Data Flows (Arrows)
-    # Student -> 1.0 Login
-    draw_arrow(g, 70, 160, 100, 160, "Creds", "top")
-    # 1.0 -> D1
-    draw_arrow(g, 106, 169, 60, 195)
-    # Student -> 2.0 Chat
-    draw_arrow(g, 40, 140, 102, 95, "Query", "left")
-    # 2.0 -> D2/D3 (Local Match Query)
-    draw_arrow(g, 135, 70, 190, 40)
-    # 2.0 -> 3.0 (Fallback)
-    draw_arrow(g, 140, 85, 220, 85, "No Match", "top")
-    # 3.0 -> 2.0 (Response)
-    draw_arrow(g, 220, 80, 140, 80, "Response", "bottom")
-    # Student -> 4.0 Booking
-    draw_arrow(g, 50, 140, 220, 145, "Book", "bottom")
-    # 4.0 -> D4
-    draw_arrow(g, 240, 175, 240, 195, "Write", "left")
-    # Admin -> 5.0 Analytics
-    draw_arrow(g, 398, 155, 360, 155, "Views", "bottom")
-    # 5.0 -> D5 (Reads logs)
-    draw_arrow(g, 350, 175, 355, 195)
+    # Flows (Arrows)
+    # Student Auth
+    draw_arrow(g, 75, 125, 105, 145, "Creds", "top")
+    draw_arrow(g, 120, 173, 120, 195)
+    draw_arrow(g, 102, 150, 75, 115, "Status", "bottom")
     
-    # Return flows (simple lines without heavy arrows to keep clean)
-    g.add(Line(100, 85, 70, 140, strokeColor=COLOR_SLATE, strokeWidth=0.5))
-    g.add(Line(220, 155, 70, 140, strokeColor=COLOR_SLATE, strokeWidth=0.5))
+    # Student Chat
+    draw_arrow(g, 75, 110, 192, 150, "Query", "left")
+    draw_arrow(g, 210, 173, 210, 195)
+    draw_arrow(g, 192, 145, 75, 105, "Advice", "bottom")
+    
+    # Fallback Chat
+    draw_arrow(g, 228, 158, 282, 158, "No Match", "top")
+    draw_arrow(g, 282, 152, 228, 152, "Tokens", "bottom")
+    
+    # Student Book
+    draw_arrow(g, 75, 95, 192, 70, "Book", "bottom")
+    draw_arrow(g, 210, 47, 210, 25, "Write", "left")
+    draw_arrow(g, 195, 60, 75, 100, "Confirm", "top")
+    
+    # Admin Analytics
+    draw_arrow(g, 393, 95, 335, 70, "Views", "bottom")
+    draw_arrow(g, 320, 47, 320, 25, "Reads", "left")
+    draw_arrow(g, 335, 75, 393, 105, "Charts", "top")
     
     d.add(g)
     return d
@@ -577,8 +576,12 @@ def get_query_volume_chart():
         # Y labels
         g.add(String(cx - 8, py - 3, str(y), fontName="Helvetica", fontSize=7, fillColor=COLOR_SLATE, textAnchor="end"))
     
-    # Y-axis label
-    g.add(String(12, cy + ch/2, "Query Volume (Daily Count)", fontName="Helvetica-Bold", fontSize=8, fillColor=COLOR_SLATE, textAnchor="middle"))
+    # Y-axis label (Rotated 90 degrees to prevent horizontal overlap with labels and grid)
+    rg = Group()
+    rg.translate(12, cy + ch/2)
+    rg.rotate(90)
+    rg.add(String(0, -3, "Query Volume (Daily Count)", fontName="Helvetica-Bold", fontSize=8, fillColor=COLOR_SLATE, textAnchor="middle"))
+    g.add(rg)
     
     # X-Axis Data points (June 1 to June 13)
     dates = ["June 1", "June 3", "June 5", "June 7", "June 9", "June 11", "June 13"]
@@ -627,11 +630,11 @@ def get_query_volume_chart():
     g.add(Line(px_s2, py_s2, px_s2, py_s2 + 25, strokeColor=COLOR_SLATE, strokeWidth=0.5, strokeDashArray=[2, 2]))
     g.add(String(px_s2, py_s2 + 28, "Sprint 2 Release (31)", fontName="Helvetica", fontSize=6, fillColor=COLOR_SLATE, textAnchor="middle"))
     
-    # Final Pilot
+    # Final Pilot (Positioned below the plot line to prevent crossing line segments)
     px_final = cx + (12.0 / 12.0) * cw
     py_final = cy + (58 / 60.0) * ch
-    g.add(Line(px_final - 30, py_final - 15, px_final - 5, py_final - 5, strokeColor=COLOR_SLATE, strokeWidth=0.5))
-    g.add(String(px_final - 32, py_final - 18, "Final Release (58)", fontName="Helvetica-Bold", fontSize=6, fillColor=COLOR_NAVY, textAnchor="end"))
+    g.add(Line(px_final - 45, py_final - 36, px_final - 5, py_final - 4, strokeColor=COLOR_SLATE, strokeWidth=0.5))
+    g.add(String(px_final - 47, py_final - 39, "Final Release (58)", fontName="Helvetica-Bold", fontSize=6, fillColor=COLOR_NAVY, textAnchor="end"))
 
     d.add(g)
     return d
