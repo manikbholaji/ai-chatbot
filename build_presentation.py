@@ -225,8 +225,8 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Project_Presentation.pdf"):
     story.append(Paragraph("<b>CHANDIGARH UNIVERSITY</b>", style_cover_subtitle))
     story.append(Paragraph("<b>CU AI ADVISOR: A CLOUD-NATIVE SERVERLESS ACADEMIC ADVISING SYSTEM</b>", style_cover_title))
     story.append(Paragraph(
-        "Project Presentation submitted in partial fulfillment of the requirements for the award of the degree of<br/>"
-        "<b>Master of Computer Applications (MCA)</b>", style_cover_subtitle))
+        "A Cloud-Native Serverless Academic Advising chatbot with hybrid local-regex routing<br/>"
+        "and client-side AI integration designed for the <b>Department of Computer Applications</b>", style_cover_subtitle))
     
     story.append(Spacer(1, 25))
     
