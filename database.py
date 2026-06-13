@@ -64,7 +64,6 @@ def get_engine():
     """
     Returns a SQLAlchemy engine. 
     Strictly uses Production PostgreSQL (via Streamlit Secrets).
-    Falls back to SQLite ONLY during automated testing or connection failure.
     """
     global IS_PRODUCTION_DB, DB_CONNECTION_ERROR
     
@@ -92,8 +91,8 @@ def get_engine():
         IS_PRODUCTION_DB = False
         if DB_CONNECTION_ERROR is None:
             DB_CONNECTION_ERROR = "DATABASE_URL not found in st.secrets"
-        local_db_path = BASE_DIR / "data" / "university.db"
-        return create_engine(f"sqlite:///{local_db_path}", connect_args={"check_same_thread": False}, pool_pre_ping=True)
+        # In-memory dummy engine to allow app startup, but get_session() blocks operations
+        return create_engine("sqlite:///:memory:", connect_args={"check_same_thread": False})
     
     db_url = db_url.strip()
 
@@ -108,20 +107,18 @@ def get_engine():
             db_url += "?sslmode=require"
         
     try:
-        # pool_pre_ping=True helps with dropped connections in cloud environments
-        engine = create_engine(db_url, pool_pre_ping=True)
+        engine = create_engine(db_url, pool_pre_ping=True, connect_args={"connect_timeout": 3})
         with engine.connect():
             pass
         IS_PRODUCTION_DB = True
         DB_CONNECTION_ERROR = None
         return engine
     except Exception as exc:
-        print(f"CRITICAL: Production database connection failed: {exc}. Falling back to local SQLite.")
+        print(f"CRITICAL: Production database connection failed: {exc}.")
         IS_PRODUCTION_DB = False
         DB_CONNECTION_ERROR = str(exc)
-        local_db_path = BASE_DIR / "data" / "university.db"
-        local_db_path.parent.mkdir(parents=True, exist_ok=True)
-        return create_engine(f"sqlite:///{local_db_path}", connect_args={"check_same_thread": False}, pool_pre_ping=True)
+        # In-memory dummy engine to allow app startup, but get_session() blocks operations
+        return create_engine("sqlite:///:memory:", connect_args={"check_same_thread": False})
 
 def get_db_error():
     return DB_CONNECTION_ERROR
@@ -245,7 +242,9 @@ def init_db():
             Policy(topic="Attendance", description="Students must maintain 75% attendance to be eligible for final examinations."),
             Policy(topic="Grading", description="Evaluation is based on a CGPA system with internal assessments and end-term exams."),
             Policy(topic="Admissions", description="Admissions are based on merit and CU-CET entrance examination results."),
-            Policy(topic="Appointments", description="Academic advising is available Mon-Fri, 9 AM to 5 PM via the online portal.")
+            Policy(topic="Appointments", description="Academic advising is available Mon-Fri, 9 AM to 5 PM via the online portal."),
+            Policy(topic="Syllabus", description="The curriculum and syllabus are subject to periodic review by the Board of Studies to align with industry trends."),
+            Policy(topic="Plagiarism", description="Academic honesty is strictly enforced. Any form of plagiarism in assignments or reports will result in disciplinary action.")
         ]
         
         for p in default_policies:
@@ -270,6 +269,8 @@ def is_production_db():
     return IS_PRODUCTION_DB
 
 def get_session():
+    if not IS_PRODUCTION_DB and os.getenv("TESTING") != "true":
+        raise ConnectionError(f"Database is offline. Production connection failed: {DB_CONNECTION_ERROR}")
     return SessionLocal()
 
 def authenticate_user(username, password_hash):
@@ -378,6 +379,25 @@ def get_appointments_db():
             "timestamp": a.timestamp.isoformat()
         } for a in appts
     ]
+
+def delete_appointment_db(student_name, date, time):
+    db = get_session()
+    try:
+        appt = db.query(Appointment).filter(
+            Appointment.student_name == student_name,
+            Appointment.date == date,
+            Appointment.time == time
+        ).first()
+        if appt:
+            db.delete(appt)
+            db.commit()
+            return True
+        return False
+    except Exception:
+        db.rollback()
+        raise
+    finally:
+        db.close()
 
 if __name__ == "__main__":
     init_db()
