@@ -101,15 +101,15 @@ class PresentationCanvas(canvas.Canvas):
         # Slide 1 & Last Slide (14) are cover pages - no footer
         if self._pageNumber != 1 and self._pageNumber != total_pages:
             # Footer Left Text
-            self.setFont("Times-Bold", 13)
+            self.setFont("Times-Bold", 16)
             self.setFillColor(COLOR_SLATE)
-            self.drawString(35, 26, "CU AI Advisor | Department of Computer Applications")
+            self.drawString(35, 22, "CU AI Advisor | Dept. of CA")
             
             # Footer Center Text
-            self.drawCentredString(396, 26, f"Slide {self._pageNumber} of {total_pages}")
+            self.drawCentredString(396, 22, f"Slide {self._pageNumber} of {total_pages}")
             
             # Footer Right Text
-            self.drawRightString(757, 26, "Manik Bhola | O24MCA110817")
+            self.drawRightString(757, 22, "Manik Bhola | O24MCA110817")
             
         self.restoreState()
 
@@ -140,8 +140,8 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Project_Presentation.pdf"):
     style_cover_title = ParagraphStyle(
         'CoverTitle',
         fontName='Times-Bold',
-        fontSize=32,
-        leading=38,
+        fontSize=36,
+        leading=42,
         alignment=TA_CENTER,
         textColor=colors.white,
         spaceAfter=15
@@ -150,8 +150,8 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Project_Presentation.pdf"):
     style_cover_subtitle = ParagraphStyle(
         'CoverSubtitle',
         fontName='Times-Roman',
-        fontSize=16,
-        leading=20,
+        fontSize=18,
+        leading=22,
         alignment=TA_CENTER,
         textColor=COLOR_BORDER,
         spaceAfter=30
@@ -160,8 +160,8 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Project_Presentation.pdf"):
     style_cover_label = ParagraphStyle(
         'CoverLabel',
         fontName='Times-Bold',
-        fontSize=14,
-        leading=17,
+        fontSize=18,
+        leading=22,
         textColor=COLOR_GOLD,
         spaceAfter=5
     )
@@ -169,8 +169,8 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Project_Presentation.pdf"):
     style_cover_val = ParagraphStyle(
         'CoverValue',
         fontName='Times-Roman',
-        fontSize=13,
-        leading=16,
+        fontSize=16,
+        leading=20,
         textColor=colors.white,
         spaceAfter=15
     )
@@ -178,8 +178,8 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Project_Presentation.pdf"):
     style_cover_date = ParagraphStyle(
         'CoverDate',
         fontName='Times-Bold',
-        fontSize=13,
-        leading=16,
+        fontSize=16,
+        leading=20,
         alignment=TA_CENTER,
         textColor=COLOR_GOLD,
         spaceBefore=25
@@ -188,8 +188,8 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Project_Presentation.pdf"):
     style_slide_title = ParagraphStyle(
         'SlideTitle',
         fontName='Times-Bold',
-        fontSize=24,
-        leading=28,
+        fontSize=28,
+        leading=32,
         textColor=colors.white,
         spaceAfter=15
     )
@@ -197,7 +197,7 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Project_Presentation.pdf"):
     style_bullet = ParagraphStyle(
         'SlideBullet',
         fontName='Times-Roman',
-        fontSize=16,
+        fontSize=17,
         leading=22,
         textColor=COLOR_TEXT_DARK,
         leftIndent=15,
@@ -208,8 +208,8 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Project_Presentation.pdf"):
     style_caption = ParagraphStyle(
         'SlideCaption',
         fontName='Times-Italic',
-        fontSize=11,
-        leading=14,
+        fontSize=16,
+        leading=20,
         alignment=TA_CENTER,
         textColor=COLOR_SLATE,
         spaceBefore=10
@@ -223,10 +223,9 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Project_Presentation.pdf"):
     # Starts on template 'First' automatically
     story.append(Spacer(1, 40))
     story.append(Paragraph("<b>CHANDIGARH UNIVERSITY</b>", style_cover_subtitle))
-    story.append(Paragraph("<b>CU AI ADVISOR: A CLOUD-NATIVE SERVERLESS ACADEMIC ADVISING SYSTEM</b>", style_cover_title))
+    story.append(Paragraph("<b>CU AI ADVISOR: CLOUD-NATIVE SERVERLESS CHATBOT</b>", style_cover_title))
     story.append(Paragraph(
-        "A Cloud-Native Serverless Academic Advising chatbot with hybrid local-regex routing<br/>"
-        "and client-side AI integration designed for the <b>Department of Computer Applications</b>", style_cover_subtitle))
+        "Intelligent Academic Advising and Scheduling Platform for the Department of Computer Applications", style_cover_subtitle))
     
     story.append(Spacer(1, 25))
     
@@ -409,8 +408,8 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Project_Presentation.pdf"):
     # ----------------------------------------------------
     # SLIDE 8: System Design - Sequence & Activity Diagram
     # ----------------------------------------------------
-    seq_drawing = scale_drawing(get_sequence_diagram_drawing(), 390)
-    act_drawing = scale_drawing(get_activity_diagram_drawing(), 390)
+    seq_drawing = scale_drawing(get_sequence_diagram_drawing(), 380)
+    act_drawing = scale_drawing(get_activity_diagram_drawing(), 380)
     
     story.extend(make_split_slide(
         "System Design: Sequence & Activity Diagram",
@@ -421,8 +420,8 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Project_Presentation.pdf"):
             "• <b>Bypass Routing:</b> Employs non-overlapping bypass lines to map output merging into the Logging database."
         ],
         [seq_drawing, Spacer(1, 10), act_drawing],
-        left_width=330,
-        right_width=390,
+        left_width=340,
+        right_width=380,
         caption="Figure 8.1: UML Sequence Flow (top) and Activity Decisions (bottom)"
     ))
     story.append(PageBreak())
@@ -445,26 +444,70 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Project_Presentation.pdf"):
     # ----------------------------------------------------
     # SLIDE 10: Testing & Verification
     # ----------------------------------------------------
-    # Create test case table
+    # Create test case table cell and header styles
+    style_table_cell = ParagraphStyle(
+        'TableCell',
+        fontName='Times-Roman',
+        fontSize=16,
+        leading=18,
+        alignment=TA_CENTER,
+        textColor=COLOR_TEXT_DARK
+    )
+    style_table_header = ParagraphStyle(
+        'TableHeader',
+        fontName='Times-Bold',
+        fontSize=16,
+        leading=18,
+        alignment=TA_CENTER,
+        textColor=colors.white
+    )
+
     test_data = [
-        ["Test ID", "Input", "Expected Output", "Actual Output", "Status"],
-        ["TC-01", "Invalid Login", "Display error", "Invalid credentials", "PASS"],
-        ["TC-02", "Book Slot", "Save record", "Slot booked in DB", "PASS"],
-        ["TC-03", "Ask Course", "Regex Match", "Display course info", "PASS"],
-        ["TC-04", "Puter AI Drop", "Fallback template", "Assistant card shown", "PASS"]
+        [
+            Paragraph("<b>Test ID</b>", style_table_header),
+            Paragraph("<b>Input</b>", style_table_header),
+            Paragraph("<b>Expected Output</b>", style_table_header),
+            Paragraph("<b>Actual Output</b>", style_table_header),
+            Paragraph("<b>Status</b>", style_table_header)
+        ],
+        [
+            Paragraph("TC-01", style_table_cell),
+            Paragraph("Invalid Login", style_table_cell),
+            Paragraph("Display error", style_table_cell),
+            Paragraph("Invalid credentials", style_table_cell),
+            Paragraph("PASS", style_table_cell)
+        ],
+        [
+            Paragraph("TC-02", style_table_cell),
+            Paragraph("Book Slot", style_table_cell),
+            Paragraph("Save record", style_table_cell),
+            Paragraph("Slot booked in DB", style_table_cell),
+            Paragraph("PASS", style_table_cell)
+        ],
+        [
+            Paragraph("TC-03", style_table_cell),
+            Paragraph("Ask Course", style_table_cell),
+            Paragraph("Regex Match", style_table_cell),
+            Paragraph("Display course info", style_table_cell),
+            Paragraph("PASS", style_table_cell)
+        ],
+        [
+            Paragraph("TC-04", style_table_cell),
+            Paragraph("Puter AI Drop", style_table_cell),
+            Paragraph("Fallback template", style_table_cell),
+            Paragraph("Assistant card shown", style_table_cell),
+            Paragraph("PASS", style_table_cell)
+        ]
     ]
-    test_table = Table(test_data, colWidths=[65, 105, 125, 125, 60])
+    test_table = Table(test_data, colWidths=[65, 105, 130, 130, 60])
     test_table.setStyle(TableStyle([
         ('BACKGROUND', (0,0), (-1,0), COLOR_NAVY),
-        ('TEXTCOLOR', (0,0), (-1,0), colors.white),
-        ('FONTNAME', (0,0), (-1,0), 'Times-Bold'),
-        ('FONTSIZE', (0,0), (-1,-1), 10),
         ('ALIGN', (0,0), (-1,-1), 'CENTER'),
         ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
         ('GRID', (0,0), (-1,-1), 0.5, COLOR_BORDER),
         ('ROWBACKGROUNDS', (0,1), (-1,-1), [colors.white, COLOR_BG_LIGHT]),
-        ('TOPPADDING', (0,0), (-1,-1), 6),
-        ('BOTTOMPADDING', (0,0), (-1,-1), 6),
+        ('TOPPADDING', (0,0), (-1,-1), 4),
+        ('BOTTOMPADDING', (0,0), (-1,-1), 4),
     ]))
 
     story.extend(make_split_slide(
@@ -476,8 +519,8 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Project_Presentation.pdf"):
             "• <b>Test Results:</b> 100% test success rate (23/23 passing) across all database connection and seeding suites."
         ],
         test_table,
-        left_width=240,
-        right_width=480,
+        left_width=230,
+        right_width=490,
         caption="Table 10.1: Core System Test Scenarios"
     ))
     story.append(PageBreak())
