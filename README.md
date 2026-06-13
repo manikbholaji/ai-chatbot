@@ -1,4 +1,4 @@
-# CU AI Advisor (MCA Final Project) - Optimized Version
+# CU AI Advisor (MCA Final Project)
 
 An AI-powered academic advising chatbot using low-code tools integrated with conversational AI APIs. This project has been refined to professional standards, featuring a modern UI, robust local logic, and advanced analytics.
 
@@ -20,7 +20,7 @@ An AI-powered academic advising chatbot using low-code tools integrated with con
 ## 🎯 Project Objectives
 The objective of this project is to build an AI-powered academic advising chatbot that provides course recommendations, academic planning suggestions, and automated appointment scheduling for Chandigarh University students.
 
-## ✅ Professional Enhancements (v4.0)
+## ✅ Professional Enhancements
 1. **Smart Intent-Based Interception**: Restructured the chatbot local routing logic to prevent false-positive keyword recommendations.
 2. **Aiven PostgreSQL SSL Support**: Programmed automatic SSL query parameter inclusion (`sslmode=require`) to resolve connection drops.
 3. **Database Upsert Migration**: Replaced naive seeding checks with full upsert capability to support complete database synchronization.
