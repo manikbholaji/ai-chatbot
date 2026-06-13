@@ -20,13 +20,15 @@ An AI-powered academic advising chatbot using low-code tools integrated with con
 ## 🎯 Project Objectives
 The objective of this project is to build an AI-powered academic advising chatbot that provides course recommendations, academic planning suggestions, and automated appointment scheduling for Chandigarh University students.
 
-## ✅ Professional Enhancements (v3.0)
+## ✅ Professional Enhancements (v4.0)
 1. **Smart Intent-Based Interception**: Restructured the chatbot local routing logic to prevent false-positive keyword recommendations.
 2. **Aiven PostgreSQL SSL Support**: Programmed automatic SSL query parameter inclusion (`sslmode=require`) to resolve connection drops.
 3. **Database Upsert Migration**: Replaced naive seeding checks with full upsert capability to support complete database synchronization.
 4. **Outage Resilient UX**: Designed friendly chat fallbacks for API network connection drops.
 5. **Data Visualization**: Integrated Plotly charts for real-time admin insights.
 6. **Session & State Management**: Added "Clear Chat" and improved logout flows.
+7. **Academic Project Report Compilation**: Developed a multi-pass ReportLab-based PDF builder (`build_report.py`) producing a strictly compliant **99-page project report** with clickable index directories and zero margin overflows.
+8. **Vector Diagram Alignments**: Re-engineered system drawings (`drawings.py`) to eliminate line crossings, align sequence lifespans, and improve DFD clarity.
 
 ---
 
@@ -65,8 +67,10 @@ The objective of this project is to build an AI-powered academic advising chatbo
 - `app.py`: Main Streamlit UI and Analytics Dashboard.
 - `chatbot.py`: Core advisor logic and system prompt configuration.
 - `database.py`: Database models and interaction layer.
+- `build_report.py`: Multi-pass PDF compilation pipeline utilizing custom canvas templates.
+- `drawings.py`: High-quality vector graphics (UML, DFDs, charts) rendered dynamically using ReportLab shape flowables.
+- `CU_AI_Advisor_MCA_Final_Report_Manik_Bhola.pdf`: The compiled, university-compliant 99-page project report.
 - `docs/ARCHITECTURE.md`: Technical documentation of system architecture, database ER diagram, and query API flow.
-- `docs/`: Project reports, Viva guides, and presentations.
 
 ## 📊 Evaluation Parameters
 This project strictly follows professional standards for MCA final semester deliverables, prioritizing privacy-first AI deployment, efficient low-code orchestration, and robust relational data management.
