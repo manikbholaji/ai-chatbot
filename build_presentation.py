@@ -1,13 +1,11 @@
-import os
-import math
 from reportlab.lib.pagesizes import letter, landscape
 from reportlab.lib import colors
 from reportlab.platypus import (
     SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, PageBreak, Frame, PageTemplate, NextPageTemplate
 )
-from reportlab.graphics.shapes import Drawing, Rect, Circle, String as DString, Line as DLine, Group
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.lib.enums import TA_JUSTIFY, TA_CENTER, TA_LEFT, TA_RIGHT
+from reportlab.graphics.shapes import Drawing, Group
+from reportlab.lib.styles import ParagraphStyle
+from reportlab.lib.enums import TA_CENTER
 from reportlab.pdfgen import canvas
 
 # Import vector diagrams from drawings.py
@@ -15,7 +13,6 @@ from drawings import (
     get_dfd_level_0_drawing,
     get_dfd_level_1_drawing,
     get_use_case_drawing,
-    get_er_diagram_drawing,
     get_class_diagram_drawing,
     get_sequence_diagram_drawing,
     get_activity_diagram_drawing,
@@ -138,8 +135,6 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Project_Presentation.pdf"):
     
     doc.pageTemplates = []
     doc.addPageTemplates([cover_template, content_template])
-    
-    styles = getSampleStyleSheet()
     
     # Custom Styles
     style_cover_title = ParagraphStyle(
