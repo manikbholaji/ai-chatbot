@@ -14,7 +14,7 @@ from drawings import (
 )
 from reportlab.lib.pagesizes import letter
 from reportlab.lib import colors
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, PageBreak, KeepTogether, Preformatted, Image
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, PageBreak, KeepTogether, Preformatted, Image, PageTemplate, Frame, NextPageTemplate
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.enums import TA_JUSTIFY, TA_CENTER, TA_LEFT
 from reportlab.pdfgen import canvas
@@ -22,6 +22,7 @@ from reportlab.pdfgen import canvas
 # --- NUMBERED CANVAS WITH RUNNING HEADER & FOOTER ---
 class NumberedCanvas(canvas.Canvas):
     TOTAL_PAGES = 0
+    APPENDIX_START_PAGE = 999
 
     def showPage(self):
         self.draw_decorations(NumberedCanvas.TOTAL_PAGES)
@@ -37,27 +38,35 @@ class NumberedCanvas(canvas.Canvas):
             self.setLineWidth(0.5)
             self.rect(58, 58, 496, 676)  # Inner border
         elif self._pageNumber > 1:
+            # Determine margins dynamically
+            if self._pageNumber >= NumberedCanvas.APPENDIX_START_PAGE:
+                x_left = 30
+                x_right = 582
+            else:
+                x_left = 72
+                x_right = 540
+
             # Running Header
             self.setFont("Times-Bold", 8)
             self.setFillColor(colors.HexColor("#475569"))
-            self.drawString(72, 750, "CU AI ADVISOR: A CLOUD-NATIVE SERVERLESS ACADEMIC ADVISING SYSTEM")
+            self.drawString(x_left, 750, "CU AI ADVISOR: A CLOUD-NATIVE SERVERLESS ACADEMIC ADVISING SYSTEM")
             self.setStrokeColor(colors.HexColor("#CBD5E1"))
             self.setLineWidth(0.5)
-            self.line(72, 742, 540, 742)
+            self.line(x_left, 742, x_right, 742)
             
             # Running Footer - Bottom Right Page Number
             self.setFont("Times-Roman", 9)
             self.setFillColor(colors.HexColor("#1A202C"))
             if page_count > 0:
-                self.drawRightString(540, 38, f"Page {self._pageNumber} of {page_count}")
+                self.drawRightString(x_right, 38, f"Page {self._pageNumber} of {page_count}")
             else:
-                self.drawRightString(540, 38, f"Page {self._pageNumber}")
+                self.drawRightString(x_right, 38, f"Page {self._pageNumber}")
             
             # Left Running Footer
-            self.drawString(72, 38, "Chandigarh University | Master of Computer Applications (MCA) Project Report")
+            self.drawString(x_left, 38, "Chandigarh University | Master of Computer Applications (MCA) Project Report")
             self.setStrokeColor(colors.HexColor("#CBD5E1"))
             self.setLineWidth(0.5)
-            self.line(72, 52, 540, 52)
+            self.line(x_left, 52, x_right, 52)
         self.restoreState()
 
 # --- IMPORT DETAILED TEXT DATA SET ---
@@ -107,6 +116,16 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Final_Report_Manik_Bhola.pdf", page_ma
         topMargin=72,
         bottomMargin=72
     )
+    
+    # Define custom frames and page templates for Appendix C layout optimization
+    normal_frame = Frame(72, 72, 468, 648, id='normal_frame', leftPadding=0, rightPadding=0, topPadding=0, bottomPadding=0)
+    wide_frame = Frame(30, 60, 552, 675, id='wide_frame', leftPadding=0, rightPadding=0, topPadding=0, bottomPadding=0)
+    
+    normal_template = PageTemplate(id='normal', frames=[normal_frame])
+    wide_template = PageTemplate(id='wide', frames=[wide_frame])
+    
+    doc.pageTemplates = []
+    doc.addPageTemplates([normal_template, wide_template])
     
     styles = getSampleStyleSheet()
     
@@ -199,8 +218,8 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Final_Report_Manik_Bhola.pdf", page_ma
     code_style = ParagraphStyle(
         'CodeBlock',
         fontName='Courier',
-        fontSize=7.0,
-        leading=9.0,
+        fontSize=6.5,
+        leading=7.2,
         spaceAfter=12
     )
 
@@ -987,6 +1006,8 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Final_Report_Manik_Bhola.pdf", page_ma
         "for sentiment charts and usage statistics, and the 'Appointment Management' page to cancel sessions.", body_style))
 
     story.append(Spacer(1, 10))
+    story.append(NextPageTemplate('wide'))
+    story.append(PageBreak())
     story.append(Paragraph("<b>Appendix C: Complete Source Code Listings</b>", heading2_style))
     story.append(Paragraph(
         "To provide full structural transparency and ensure ease of audits, the complete source code files "
@@ -1003,7 +1024,7 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Final_Report_Manik_Bhola.pdf", page_ma
         try:
             with open(filename, "r", encoding="utf-8") as f:
                 code_text = f.read()
-            wrapped_code = wrap_code_text(code_text)
+            wrapped_code = wrap_code_text(code_text, max_len=135)
             # Escape HTML entities
             escaped_code = wrapped_code.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
             story.append(Preformatted(escaped_code, code_style))
@@ -1137,8 +1158,9 @@ def scan_pdf_page_mappings(pdf_path):
     return mappings
 
 def build_pdf_multipass(filename="CU_AI_Advisor_MCA_Final_Report_Manik_Bhola.pdf"):
-    # Clear total pages for Pass 1
+    # Clear total pages and appendix start for Pass 1
     NumberedCanvas.TOTAL_PAGES = 0
+    NumberedCanvas.APPENDIX_START_PAGE = 999
     print("Pass 1: Building PDF with guess page numbers...")
     build_pdf(filename, page_mappings=None)
     
@@ -1152,6 +1174,7 @@ def build_pdf_multipass(filename="CU_AI_Advisor_MCA_Final_Report_Manik_Bhola.pdf
         
     print(f"\nPass 2: Re-building PDF with exact page alignments (Total Pages: {total_pages})...")
     NumberedCanvas.TOTAL_PAGES = total_pages
+    NumberedCanvas.APPENDIX_START_PAGE = mappings.get('chapter10', 999)
     build_pdf(filename, page_mappings=mappings)
     
     print("Pass 2 complete. Re-scanning PDF to check for any layout shift...")
@@ -1169,10 +1192,13 @@ def build_pdf_multipass(filename="CU_AI_Advisor_MCA_Final_Report_Manik_Bhola.pdf
             print(f"  {k}: {v1} -> {v2}")
         print("\nPass 3: Running third compilation to ensure convergence...")
         NumberedCanvas.TOTAL_PAGES = new_total_pages
+        NumberedCanvas.APPENDIX_START_PAGE = new_mappings.get('chapter10', 999)
         build_pdf(filename, page_mappings=new_mappings)
         print("Pass 3 complete. Convergence achieved!")
     else:
         print("PDF generation converged successfully on Pass 2!")
 
 if __name__ == "__main__":
-    build_pdf_multipass()
+    import sys
+    out_filename = sys.argv[1] if len(sys.argv) > 1 else "CU_AI_Advisor_MCA_Final_Report_Manik_Bhola.pdf"
+    build_pdf_multipass(out_filename)
