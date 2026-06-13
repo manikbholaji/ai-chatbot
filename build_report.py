@@ -345,7 +345,7 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Final_Report_Manik_Bhola.pdf", page_ma
     # ==========================================
     # BONAFIDE CERTIFICATE
     # ==========================================
-    story.append(Paragraph("<b>BONAFIDE CERTIFICATE</b>", cover_title_style))
+    story.append(Paragraph('<a name="bonafide"/><b>BONAFIDE CERTIFICATE</b>', cover_title_style))
     story.append(Spacer(1, 20))
     story.append(Paragraph(
         "This is to certify that the project report entitled <b>\"CU AI ADVISOR: A CLOUD-NATIVE "
@@ -376,7 +376,7 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Final_Report_Manik_Bhola.pdf", page_ma
     # ==========================================
     # DECLARATION
     # ==========================================
-    story.append(Paragraph("<b>DECLARATION</b>", cover_title_style))
+    story.append(Paragraph('<a name="declaration"/><b>DECLARATION</b>', cover_title_style))
     story.append(Spacer(1, 20))
     story.append(Paragraph(
         "I, <b>Manik Bhola</b>, hereby solemnly declare that the project report titled <b>\"CU AI ADVISOR: "
@@ -411,7 +411,7 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Final_Report_Manik_Bhola.pdf", page_ma
     # ==========================================
     # ACKNOWLEDGEMENT
     # ==========================================
-    story.append(Paragraph("<b>ACKNOWLEDGEMENT</b>", cover_title_style))
+    story.append(Paragraph('<a name="acknowledgement"/><b>ACKNOWLEDGEMENT</b>', cover_title_style))
     story.append(Spacer(1, 20))
     story.append(Paragraph(
         "The successful completion of this project is the result of the support, guidance, and cooperation "
@@ -436,7 +436,7 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Final_Report_Manik_Bhola.pdf", page_ma
     # ==========================================
     # ABSTRACT
     # ==========================================
-    story.append(Paragraph("<b>ABSTRACT</b>", cover_title_style))
+    story.append(Paragraph('<a name="abstract"/><b>ABSTRACT</b>', cover_title_style))
     story.append(Spacer(1, 20))
     story.append(Paragraph(
         "<b>Project Title:</b> CU AI Advisor: A Cloud-Native Serverless Academic Advising System<br/>"
@@ -457,28 +457,28 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Final_Report_Manik_Bhola.pdf", page_ma
     # ==========================================
     # TABLE OF CONTENTS
     # ==========================================
-    story.append(Paragraph("<b>TABLE OF CONTENTS</b>", cover_title_style))
+    story.append(Paragraph('<a name="toc"/><b>TABLE OF CONTENTS</b>', cover_title_style))
     story.append(Spacer(1, 20))
     toc_data = [
         [Paragraph("<b>Chapter</b>", body_bold_style), Paragraph("<b>Page No.</b>", body_bold_style)],
-        [Paragraph("Bonafide Certificate", body_style), Paragraph(str(page_mappings['bonafide']), body_style)],
-        [Paragraph("Declaration", body_style), Paragraph(str(page_mappings['declaration']), body_style)],
-        [Paragraph("Acknowledgement", body_style), Paragraph(str(page_mappings['acknowledgement']), body_style)],
-        [Paragraph("Abstract", body_style), Paragraph(str(page_mappings['abstract']), body_style)],
-        [Paragraph("Table of Contents", body_style), Paragraph(str(page_mappings['toc']), body_style)],
-        [Paragraph("List of Figures", body_style), Paragraph(str(page_mappings['list_figures']), body_style)],
-        [Paragraph("List of Tables", body_style), Paragraph(str(page_mappings['list_tables']), body_style)],
-        [Paragraph("List of Abbreviations", body_style), Paragraph(str(page_mappings['abbreviations']), body_style)],
-        [Paragraph("<b>Chapter 1: Introduction</b>", body_bold_style), Paragraph(f"<b>{page_mappings['chapter1']}</b>", body_bold_style)],
-        [Paragraph("<b>Chapter 2: Literature Review / System Study</b>", body_bold_style), Paragraph(f"<b>{page_mappings['chapter2']}</b>", body_bold_style)],
-        [Paragraph("<b>Chapter 3: System Analysis</b>", body_bold_style), Paragraph(f"<b>{page_mappings['chapter3']}</b>", body_bold_style)],
-        [Paragraph("<b>Chapter 4: System Design</b>", body_bold_style), Paragraph(f"<b>{page_mappings['chapter4']}</b>", body_bold_style)],
-        [Paragraph("<b>Chapter 5: System Implementation</b>", body_bold_style), Paragraph(f"<b>{page_mappings['chapter5']}</b>", body_bold_style)],
-        [Paragraph("<b>Chapter 6: Testing</b>", body_bold_style), Paragraph(f"<b>{page_mappings['chapter6']}</b>", body_bold_style)],
-        [Paragraph("<b>Chapter 7: Results & Discussion</b>", body_bold_style), Paragraph(f"<b>{page_mappings['chapter7']}</b>", body_bold_style)],
-        [Paragraph("<b>Chapter 8: Conclusion & Future Scope</b>", body_bold_style), Paragraph(f"<b>{page_mappings['chapter8']}</b>", body_bold_style)],
-        [Paragraph("<b>Chapter 9: References</b>", body_bold_style), Paragraph(f"<b>{page_mappings['chapter9']}</b>", body_bold_style)],
-        [Paragraph("<b>Chapter 10: Appendices</b>", body_bold_style), Paragraph(f"<b>{page_mappings['chapter10']}</b>", body_bold_style)],
+        [Paragraph('<a href="#bonafide" color="#1A202C">Bonafide Certificate</a>', body_style), Paragraph(f'<a href="#bonafide" color="#1A202C">{page_mappings["bonafide"]}</a>', body_style)],
+        [Paragraph('<a href="#declaration" color="#1A202C">Declaration</a>', body_style), Paragraph(f'<a href="#declaration" color="#1A202C">{page_mappings["declaration"]}</a>', body_style)],
+        [Paragraph('<a href="#acknowledgement" color="#1A202C">Acknowledgement</a>', body_style), Paragraph(f'<a href="#acknowledgement" color="#1A202C">{page_mappings["acknowledgement"]}</a>', body_style)],
+        [Paragraph('<a href="#abstract" color="#1A202C">Abstract</a>', body_style), Paragraph(f'<a href="#abstract" color="#1A202C">{page_mappings["abstract"]}</a>', body_style)],
+        [Paragraph('<a href="#toc" color="#1A202C">Table of Contents</a>', body_style), Paragraph(f'<a href="#toc" color="#1A202C">{page_mappings["toc"]}</a>', body_style)],
+        [Paragraph('<a href="#list_figures" color="#1A202C">List of Figures</a>', body_style), Paragraph(f'<a href="#list_figures" color="#1A202C">{page_mappings["list_figures"]}</a>', body_style)],
+        [Paragraph('<a href="#list_tables" color="#1A202C">List of Tables</a>', body_style), Paragraph(f'<a href="#list_tables" color="#1A202C">{page_mappings["list_tables"]}</a>', body_style)],
+        [Paragraph('<a href="#abbreviations" color="#1A202C">List of Abbreviations</a>', body_style), Paragraph(f'<a href="#abbreviations" color="#1A202C">{page_mappings["abbreviations"]}</a>', body_style)],
+        [Paragraph('<a href="#chapter1" color="#1A365D"><b>Chapter 1: Introduction</b></a>', body_bold_style), Paragraph(f'<a href="#chapter1" color="#1A365D"><b>{page_mappings["chapter1"]}</b></a>', body_bold_style)],
+        [Paragraph('<a href="#chapter2" color="#1A365D"><b>Chapter 2: Literature Review / System Study</b></a>', body_bold_style), Paragraph(f'<a href="#chapter2" color="#1A365D"><b>{page_mappings["chapter2"]}</b></a>', body_bold_style)],
+        [Paragraph('<a href="#chapter3" color="#1A365D"><b>Chapter 3: System Analysis</b></a>', body_bold_style), Paragraph(f'<a href="#chapter3" color="#1A365D"><b>{page_mappings["chapter3"]}</b></a>', body_bold_style)],
+        [Paragraph('<a href="#chapter4" color="#1A365D"><b>Chapter 4: System Design</b></a>', body_bold_style), Paragraph(f'<a href="#chapter4" color="#1A365D"><b>{page_mappings["chapter4"]}</b></a>', body_bold_style)],
+        [Paragraph('<a href="#chapter5" color="#1A365D"><b>Chapter 5: System Implementation</b></a>', body_bold_style), Paragraph(f'<a href="#chapter5" color="#1A365D"><b>{page_mappings["chapter5"]}</b></a>', body_bold_style)],
+        [Paragraph('<a href="#chapter6" color="#1A365D"><b>Chapter 6: Testing</b></a>', body_bold_style), Paragraph(f'<a href="#chapter6" color="#1A365D"><b>{page_mappings["chapter6"]}</b></a>', body_bold_style)],
+        [Paragraph('<a href="#chapter7" color="#1A365D"><b>Chapter 7: Results & Discussion</b></a>', body_bold_style), Paragraph(f'<a href="#chapter7" color="#1A365D"><b>{page_mappings["chapter7"]}</b></a>', body_bold_style)],
+        [Paragraph('<a href="#chapter8" color="#1A365D"><b>Chapter 8: Conclusion & Future Scope</b></a>', body_bold_style), Paragraph(f'<a href="#chapter8" color="#1A365D"><b>{page_mappings["chapter8"]}</b></a>', body_bold_style)],
+        [Paragraph('<a href="#chapter9" color="#1A365D"><b>Chapter 9: References</b></a>', body_bold_style), Paragraph(f'<a href="#chapter9" color="#1A365D"><b>{page_mappings["chapter9"]}</b></a>', body_bold_style)],
+        [Paragraph('<a href="#chapter10" color="#1A365D"><b>Chapter 10: Appendices</b></a>', body_bold_style), Paragraph(f'<a href="#chapter10" color="#1A365D"><b>{page_mappings["chapter10"]}</b></a>', body_bold_style)],
     ]
     t_toc = Table(toc_data, colWidths=[350, 118])
     t_toc.setStyle(TableStyle([
@@ -492,24 +492,24 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Final_Report_Manik_Bhola.pdf", page_ma
     # ==========================================
     # LIST OF FIGURES (Separate page!)
     # ==========================================
-    story.append(Paragraph("<b>LIST OF FIGURES</b>", cover_title_style))
+    story.append(Paragraph('<a name="list_figures"/><b>LIST OF FIGURES</b>', cover_title_style))
     story.append(Spacer(1, 20))
     fig_data = [
         [Paragraph("<b>Figure Description</b>", body_bold_style), Paragraph("<b>Page No.</b>", body_bold_style)],
-        [Paragraph("Figure 3.1: DFD Level 0 Context Diagram", body_style), Paragraph(str(page_mappings['fig_3_1']), body_style)],
-        [Paragraph("Figure 3.2: DFD Level 1 System Data Flow Diagram", body_style), Paragraph(str(page_mappings['fig_3_2']), body_style)],
-        [Paragraph("Figure 4.1: Unified Modeling Language (UML) Use Case Diagram", body_style), Paragraph(str(page_mappings['fig_4_1']), body_style)],
-        [Paragraph("Figure 4.2: Database Entity-Relationship Diagram (3NF Schema)", body_style), Paragraph(str(page_mappings['fig_4_2']), body_style)],
-        [Paragraph("Figure 4.3: UML Class Interaction Diagram", body_style), Paragraph(str(page_mappings['fig_4_3']), body_style)],
-        [Paragraph("Figure 4.4: Sequence Diagram for Chat Resolution Flow", body_style), Paragraph(str(page_mappings['fig_4_4']), body_style)],
-        [Paragraph("Figure 4.5: System Activity Logic Lifecycle Diagram", body_style), Paragraph(str(page_mappings['fig_4_5']), body_style)],
-        [Paragraph("Figure 5.1: Student Chat Portal Interface (Anonymous User Session)", body_style), Paragraph(str(page_mappings['fig_5_1']), body_style)],
-        [Paragraph("Figure 5.2: Student Advising Chat Portal (Authenticated Administrator Session)", body_style), Paragraph(str(page_mappings['fig_5_2']), body_style)],
-        [Paragraph("Figure 5.3: Academic Appointment Slots Booking View", body_style), Paragraph(str(page_mappings['fig_5_3']), body_style)],
-        [Paragraph("Figure 5.4: Administrator Sentiment & Query Volume Analytics Dashboard", body_style), Paragraph(str(page_mappings['fig_5_4']), body_style)],
-        [Paragraph("Figure 5.5: Registered Student Appointment Scheduling Management Portal", body_style), Paragraph(str(page_mappings['fig_5_5']), body_style)],
-        [Paragraph("Figure 7.1: Query Volume Over Time Graph", body_style), Paragraph(str(page_mappings['fig_7_1']), body_style)],
-        [Paragraph("Figure 7.2: Sentiment Distribution Graph", body_style), Paragraph(str(page_mappings['fig_7_2']), body_style)],
+        [Paragraph('<a href="#fig_3_1" color="#1A202C">Figure 3.1: DFD Level 0 Context Diagram</a>', body_style), Paragraph(f'<a href="#fig_3_1" color="#1A202C">{page_mappings["fig_3_1"]}</a>', body_style)],
+        [Paragraph('<a href="#fig_3_2" color="#1A202C">Figure 3.2: DFD Level 1 System Data Flow Diagram</a>', body_style), Paragraph(f'<a href="#fig_3_2" color="#1A202C">{page_mappings["fig_3_2"]}</a>', body_style)],
+        [Paragraph('<a href="#fig_4_1" color="#1A202C">Figure 4.1: Unified Modeling Language (UML) Use Case Diagram</a>', body_style), Paragraph(f'<a href="#fig_4_1" color="#1A202C">{page_mappings["fig_4_1"]}</a>', body_style)],
+        [Paragraph('<a href="#fig_4_2" color="#1A202C">Figure 4.2: Database Entity-Relationship Diagram (3NF Schema)</a>', body_style), Paragraph(f'<a href="#fig_4_2" color="#1A202C">{page_mappings["fig_4_2"]}</a>', body_style)],
+        [Paragraph('<a href="#fig_4_3" color="#1A202C">Figure 4.3: UML Class Interaction Diagram</a>', body_style), Paragraph(f'<a href="#fig_4_3" color="#1A202C">{page_mappings["fig_4_3"]}</a>', body_style)],
+        [Paragraph('<a href="#fig_4_4" color="#1A202C">Figure 4.4: Sequence Diagram for Chat Resolution Flow</a>', body_style), Paragraph(f'<a href="#fig_4_4" color="#1A202C">{page_mappings["fig_4_4"]}</a>', body_style)],
+        [Paragraph('<a href="#fig_4_5" color="#1A202C">Figure 4.5: System Activity Logic Lifecycle Diagram</a>', body_style), Paragraph(f'<a href="#fig_4_5" color="#1A202C">{page_mappings["fig_4_5"]}</a>', body_style)],
+        [Paragraph('<a href="#fig_5_1" color="#1A202C">Figure 5.1: Student Chat Portal Interface (Anonymous User Session)</a>', body_style), Paragraph(f'<a href="#fig_5_1" color="#1A202C">{page_mappings["fig_5_1"]}</a>', body_style)],
+        [Paragraph('<a href="#fig_5_2" color="#1A202C">Figure 5.2: Student Advising Chat Portal (Authenticated Administrator Session)</a>', body_style), Paragraph(f'<a href="#fig_5_2" color="#1A202C">{page_mappings["fig_5_2"]}</a>', body_style)],
+        [Paragraph('<a href="#fig_5_3" color="#1A202C">Figure 5.3: Academic Appointment Slots Booking View</a>', body_style), Paragraph(f'<a href="#fig_5_3" color="#1A202C">{page_mappings["fig_5_3"]}</a>', body_style)],
+        [Paragraph('<a href="#fig_5_4" color="#1A202C">Figure 5.4: Administrator Sentiment & Query Volume Analytics Dashboard</a>', body_style), Paragraph(f'<a href="#fig_5_4" color="#1A202C">{page_mappings["fig_5_4"]}</a>', body_style)],
+        [Paragraph('<a href="#fig_5_5" color="#1A202C">Figure 5.5: Registered Student Appointment Scheduling Management Portal</a>', body_style), Paragraph(f'<a href="#fig_5_5" color="#1A202C">{page_mappings["fig_5_5"]}</a>', body_style)],
+        [Paragraph('<a href="#fig_7_1" color="#1A202C">Figure 7.1: Query Volume Over Time Graph</a>', body_style), Paragraph(f'<a href="#fig_7_1" color="#1A202C">{page_mappings["fig_7_1"]}</a>', body_style)],
+        [Paragraph('<a href="#fig_7_2" color="#1A202C">Figure 7.2: Sentiment Distribution Graph</a>', body_style), Paragraph(f'<a href="#fig_7_2" color="#1A202C">{page_mappings["fig_7_2"]}</a>', body_style)],
     ]
     t_fig = Table(fig_data, colWidths=[350, 118])
     t_fig.setStyle(TableStyle([
@@ -523,15 +523,15 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Final_Report_Manik_Bhola.pdf", page_ma
     # ==========================================
     # LIST OF TABLES (Separate page!)
     # ==========================================
-    story.append(Paragraph("<b>LIST OF TABLES</b>", cover_title_style))
+    story.append(Paragraph('<a name="list_tables"/><b>LIST OF TABLES</b>', cover_title_style))
     story.append(Spacer(1, 20))
     table_data = [
         [Paragraph("<b>Table Description</b>", body_bold_style), Paragraph("<b>Page No.</b>", body_bold_style)],
-        [Paragraph("Table 2.1: Comparative Analysis of Student Advising Architectures", body_style), Paragraph(str(page_mappings['table_2_1']), body_style)],
-        [Paragraph("Table 3.1: Minimum System Hardware and Software Requirements Specifications", body_style), Paragraph(str(page_mappings['table_3_1']), body_style)],
-        [Paragraph("Table 4.1: Primary Database Entity Schema Mappings", body_style), Paragraph(str(page_mappings['table_4_1']), body_style)],
-        [Paragraph("Table 6.1: Unit Verification Test Suite Case Matrix", body_style), Paragraph(str(page_mappings['table_6_1']), body_style)],
-        [Paragraph("Table 6.2: System Integration and E2E Test Case Matrix", body_style), Paragraph(str(page_mappings['table_6_2']), body_style)],
+        [Paragraph('<a href="#table_2_1" color="#1A202C">Table 2.1: Comparative Analysis of Student Advising Architectures</a>', body_style), Paragraph(f'<a href="#table_2_1" color="#1A202C">{page_mappings["table_2_1"]}</a>', body_style)],
+        [Paragraph('<a href="#table_3_1" color="#1A202C">Table 3.1: Minimum System Hardware and Software Requirements Specifications</a>', body_style), Paragraph(f'<a href="#table_3_1" color="#1A202C">{page_mappings["table_3_1"]}</a>', body_style)],
+        [Paragraph('<a href="#table_4_1" color="#1A202C">Table 4.1: Primary Database Entity Schema Mappings</a>', body_style), Paragraph(f'<a href="#table_4_1" color="#1A202C">{page_mappings["table_4_1"]}</a>', body_style)],
+        [Paragraph('<a href="#table_6_1" color="#1A202C">Table 6.1: Unit Verification Test Suite Case Matrix</a>', body_style), Paragraph(f'<a href="#table_6_1" color="#1A202C">{page_mappings["table_6_1"]}</a>', body_style)],
+        [Paragraph('<a href="#table_6_2" color="#1A202C">Table 6.2: System Integration and E2E Test Case Matrix</a>', body_style), Paragraph(f'<a href="#table_6_2" color="#1A202C">{page_mappings["table_6_2"]}</a>', body_style)],
     ]
     t_tab = Table(table_data, colWidths=[350, 118])
     t_tab.setStyle(TableStyle([
@@ -545,7 +545,7 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Final_Report_Manik_Bhola.pdf", page_ma
     # ==========================================
     # LIST OF ABBREVIATIONS
     # ==========================================
-    story.append(Paragraph("<b>LIST OF ABBREVIATIONS</b>", cover_title_style))
+    story.append(Paragraph('<a name="abbreviations"/><b>LIST OF ABBREVIATIONS</b>', cover_title_style))
     story.append(Spacer(1, 20))
     ab_data = [
         [Paragraph("<b>Abbreviation</b>", body_bold_style), Paragraph("<b>Full Description / Meaning</b>", body_bold_style)],
@@ -579,7 +579,7 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Final_Report_Manik_Bhola.pdf", page_ma
     # --- RENDER CHAPTERS & PARAGRAPHS FROM DATA SET ---
     for ch_num in sorted(CHAPTERS_DATA.keys(), key=int):
         ch = CHAPTERS_DATA[ch_num]
-        story.append(Paragraph(f"<b>{ch['title']}</b>", heading1_style))
+        story.append(Paragraph(f'<a name="chapter{ch_num}"/><b>{ch["title"]}</b>', heading1_style))
         
         # Iterate over sections in order
         sections = ch["sections"]
@@ -597,14 +597,14 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Final_Report_Manik_Bhola.pdf", page_ma
                     "The flow of data is described below at two levels of abstraction: Level 0 (Context Diagram) and Level 1 (Process Breakdown Diagram).", body_style))
                 
                 story.append(Spacer(1, 10))
-                story.append(Paragraph("<b>Figure 3.1: DFD Level 0 Context Diagram</b>", body_bold_style))
+                story.append(Paragraph('<a name="fig_3_1"/><b>Figure 3.1: DFD Level 0 Context Diagram</b>', body_bold_style))
                 story.append(Spacer(1, 6))
                 story.append(get_dfd_level_0_drawing())
                 story.append(Spacer(1, 6))
                 story.append(Paragraph(f"<i>Figure 3.1: DFD Level 0 Context Diagram</i>", body_center_style))
                 
                 story.append(Spacer(1, 10))
-                story.append(Paragraph("<b>Figure 3.2: DFD Level 1 System Data Flow Diagram</b>", body_bold_style))
+                story.append(Paragraph('<a name="fig_3_2"/><b>Figure 3.2: DFD Level 1 System Data Flow Diagram</b>', body_bold_style))
                 story.append(Spacer(1, 6))
                 story.append(get_dfd_level_1_drawing())
                 story.append(Spacer(1, 6))
@@ -613,7 +613,7 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Final_Report_Manik_Bhola.pdf", page_ma
                 
             elif sec_title == "3.1 Requirements Specification":
                 story.append(Spacer(1, 10))
-                story.append(Paragraph("<b>Table 3.1: Minimum System Hardware and Software Requirements Specifications</b>", body_bold_style))
+                story.append(Paragraph('<a name="table_3_1"/><b>Table 3.1: Minimum System Hardware and Software Requirements Specifications</b>', body_bold_style))
                 req_headers = [Paragraph("<b>Requirement Parameter</b>", table_header_style), 
                                Paragraph("<b>Development & Production Specifications</b>", table_header_style)]
                 req_rows = [
@@ -642,7 +642,7 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Final_Report_Manik_Bhola.pdf", page_ma
                 
             elif sec_title == "2.2 Comparative Analysis of Technologies":
                 story.append(Spacer(1, 10))
-                story.append(Paragraph("<b>Table 2.1: Comparative Analysis of Student Advising Architectures</b>", body_bold_style))
+                story.append(Paragraph('<a name="table_2_1"/><b>Table 2.1: Comparative Analysis of Student Advising Architectures</b>', body_bold_style))
                 comp_headers = [Paragraph("<b>Comparative Dimension</b>", table_header_style), 
                                 Paragraph("<b>Static Campus Portal</b>", table_header_style), 
                                 Paragraph("<b>Centralized Cloud AI</b>", table_header_style), 
@@ -672,7 +672,7 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Final_Report_Manik_Bhola.pdf", page_ma
                 
             elif sec_title == "4.1 Database Design & Schema":
                 story.append(Spacer(1, 10))
-                story.append(Paragraph("<b>Table 4.1: Primary Database Entity Schema Mappings</b>", body_bold_style))
+                story.append(Paragraph('<a name="table_4_1"/><b>Table 4.1: Primary Database Entity Schema Mappings</b>', body_bold_style))
                 db_map_headers = [
                     Paragraph("<b>Table Name</b>", table_header_style),
                     Paragraph("<b>Primary Key</b>", table_header_style),
@@ -768,35 +768,35 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Final_Report_Manik_Bhola.pdf", page_ma
 
             elif sec_title == "4.2 UML Diagrams & System Diagrams":
                 story.append(Spacer(1, 10))
-                story.append(Paragraph("<b>Figure 4.1: UML Use Case Diagram</b>", body_bold_style))
+                story.append(Paragraph('<a name="fig_4_1"/><b>Figure 4.1: UML Use Case Diagram</b>', body_bold_style))
                 story.append(Spacer(1, 6))
                 story.append(get_use_case_drawing())
                 story.append(Spacer(1, 6))
                 story.append(Paragraph(f"<i>Figure 4.1: Unified Modeling Language (UML) Use Case Diagram</i>", body_center_style))
                 
                 story.append(Spacer(1, 10))
-                story.append(Paragraph("<b>Figure 4.2: Database Entity-Relationship Diagram (3NF Schema)</b>", body_bold_style))
+                story.append(Paragraph('<a name="fig_4_2"/><b>Figure 4.2: Database Entity-Relationship Diagram (3NF Schema)</b>', body_bold_style))
                 story.append(Spacer(1, 6))
                 story.append(get_er_diagram_drawing())
                 story.append(Spacer(1, 6))
                 story.append(Paragraph(f"<i>Figure 4.2: Database Entity-Relationship Diagram (3NF Schema)</i>", body_center_style))
                 
                 story.append(Spacer(1, 10))
-                story.append(Paragraph("<b>Figure 4.3: UML Class Interaction Diagram</b>", body_bold_style))
+                story.append(Paragraph('<a name="fig_4_3"/><b>Figure 4.3: UML Class Interaction Diagram</b>', body_bold_style))
                 story.append(Spacer(1, 6))
                 story.append(get_class_diagram_drawing())
                 story.append(Spacer(1, 6))
                 story.append(Paragraph(f"<i>Figure 4.3: UML Class Interaction Diagram</i>", body_center_style))
                 
                 story.append(Spacer(1, 10))
-                story.append(Paragraph("<b>Figure 4.4: Sequence Diagram for Chat Resolution Flow</b>", body_bold_style))
+                story.append(Paragraph('<a name="fig_4_4"/><b>Figure 4.4: Sequence Diagram for Chat Resolution Flow</b>', body_bold_style))
                 story.append(Spacer(1, 6))
                 story.append(get_sequence_diagram_drawing())
                 story.append(Spacer(1, 6))
                 story.append(Paragraph(f"<i>Figure 4.4: Sequence Diagram for Chat Resolution Flow</i>", body_center_style))
                 
                 story.append(Spacer(1, 10))
-                story.append(Paragraph("<b>Figure 4.5: System Activity Logic Lifecycle Diagram</b>", body_bold_style))
+                story.append(Paragraph('<a name="fig_4_5"/><b>Figure 4.5: System Activity Logic Lifecycle Diagram</b>', body_bold_style))
                 story.append(Spacer(1, 6))
                 story.append(get_activity_diagram_drawing())
                 story.append(Spacer(1, 6))
@@ -806,7 +806,7 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Final_Report_Manik_Bhola.pdf", page_ma
             elif sec_title == "5.5 Application Screenshots & Explanations":
                 story.append(Spacer(1, 10))
                 # Screenshot 1
-                story.append(Paragraph("<b>Figure 5.1: Student Chat Portal Interface (Anonymous User Session)</b>", body_bold_style))
+                story.append(Paragraph('<a name="fig_5_1"/><b>Figure 5.1: Student Chat Portal Interface (Anonymous User Session)</b>', body_bold_style))
                 img_path_1 = "data/screenshots/screenshot_1_anonymous_chat.png"
                 if os.path.exists(img_path_1):
                     story.append(KeepTogether([
@@ -820,7 +820,7 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Final_Report_Manik_Bhola.pdf", page_ma
                 story.append(Spacer(1, 15))
 
                 # Screenshot 2
-                story.append(Paragraph("<b>Figure 5.2: Student Advising Chat Portal (Authenticated Administrator Session)</b>", body_bold_style))
+                story.append(Paragraph('<a name="fig_5_2"/><b>Figure 5.2: Student Advising Chat Portal (Authenticated Administrator Session)</b>', body_bold_style))
                 img_path_2 = "data/screenshots/screenshot_2_admin_chat.png"
                 if os.path.exists(img_path_2):
                     story.append(KeepTogether([
@@ -834,7 +834,7 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Final_Report_Manik_Bhola.pdf", page_ma
                 story.append(PageBreak())
 
                 # Screenshot 3
-                story.append(Paragraph("<b>Figure 5.3: Academic Appointment Slots Booking View</b>", body_bold_style))
+                story.append(Paragraph('<a name="fig_5_3"/><b>Figure 5.3: Academic Appointment Slots Booking View</b>', body_bold_style))
                 img_path_3 = "data/screenshots/screenshot_3_booking_page.png"
                 if os.path.exists(img_path_3):
                     story.append(KeepTogether([
@@ -848,7 +848,7 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Final_Report_Manik_Bhola.pdf", page_ma
                 story.append(Spacer(1, 15))
 
                 # Screenshot 4
-                story.append(Paragraph("<b>Figure 5.4: Administrator Sentiment & Query Volume Analytics Dashboard</b>", body_bold_style))
+                story.append(Paragraph('<a name="fig_5_4"/><b>Figure 5.4: Administrator Sentiment & Query Volume Analytics Dashboard</b>', body_bold_style))
                 img_path_4 = "data/screenshots/screenshot_4_admin_dashboard.png"
                 if os.path.exists(img_path_4):
                     story.append(KeepTogether([
@@ -862,7 +862,7 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Final_Report_Manik_Bhola.pdf", page_ma
                 story.append(PageBreak())
 
                 # Screenshot 5
-                story.append(Paragraph("<b>Figure 5.5: Registered Student Appointment Scheduling Management Portal</b>", body_bold_style))
+                story.append(Paragraph('<a name="fig_5_5"/><b>Figure 5.5: Registered Student Appointment Scheduling Management Portal</b>', body_bold_style))
                 img_path_5 = "data/screenshots/screenshot_5_appointments_list.png"
                 if os.path.exists(img_path_5):
                     story.append(KeepTogether([
@@ -877,7 +877,7 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Final_Report_Manik_Bhola.pdf", page_ma
                 
             elif sec_title == "6.2 Unit Testing Validation Matrix":
                 story.append(Spacer(1, 10))
-                story.append(Paragraph("<b>Table 6.1: Unit Verification Test Suite Case Matrix</b>", body_bold_style))
+                story.append(Paragraph('<a name="table_6_1"/><b>Table 6.1: Unit Verification Test Suite Case Matrix</b>', body_bold_style))
                 t1_headers = [Paragraph("<b>Test ID</b>", table_header_style), 
                               Paragraph("<b>Function Verified</b>", table_header_style), 
                               Paragraph("<b>Inputs Sent</b>", table_header_style), 
@@ -907,7 +907,7 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Final_Report_Manik_Bhola.pdf", page_ma
                 
             elif sec_title == "6.3 End-to-End (E2E) Test Suite":
                 story.append(Spacer(1, 10))
-                story.append(Paragraph("<b>Table 6.2: System Integration and E2E Test Case Matrix</b>", body_bold_style))
+                story.append(Paragraph('<a name="table_6_2"/><b>Table 6.2: System Integration and E2E Test Case Matrix</b>', body_bold_style))
                 t2_headers = [Paragraph("<b>Test ID</b>", table_header_style), 
                               Paragraph("<b>Action Simulated</b>", table_header_style), 
                               Paragraph("<b>Input Parameters</b>", table_header_style), 
@@ -937,14 +937,14 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Final_Report_Manik_Bhola.pdf", page_ma
                 
             elif sec_title == "7.2 Sentiment and Analytics Insights":
                 story.append(Spacer(1, 10))
-                story.append(Paragraph("<b>Figure 7.1: Query Volume Over Time Graph</b>", body_bold_style))
+                story.append(Paragraph('<a name="fig_7_1"/><b>Figure 7.1: Query Volume Over Time Graph</b>', body_bold_style))
                 story.append(Spacer(1, 6))
                 story.append(get_query_volume_chart())
                 story.append(Spacer(1, 6))
                 story.append(Paragraph(f"<i>Figure 7.1: Query Volume Over Time Graph</i>", body_center_style))
                 
                 story.append(Spacer(1, 10))
-                story.append(Paragraph("<b>Figure 7.2: Sentiment Distribution Graph</b>", body_bold_style))
+                story.append(Paragraph('<a name="fig_7_2"/><b>Figure 7.2: Sentiment Distribution Graph</b>', body_bold_style))
                 story.append(Spacer(1, 6))
                 story.append(get_sentiment_chart())
                 story.append(Spacer(1, 6))
@@ -956,7 +956,7 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Final_Report_Manik_Bhola.pdf", page_ma
     # ==========================================
     # CHAPTER 9: REFERENCES
     # ==========================================
-    story.append(Paragraph("<b>Chapter 9: References</b>", heading1_style))
+    story.append(Paragraph('<a name="chapter9"/><b>Chapter 9: References</b>', heading1_style))
     story.append(Spacer(1, 10))
     references_list = [
         "1. Vaswani, A., Shazeer, N., Parmar, N., Uszkoreit, J., Jones, L., Gomez, A. N., ... & Polosukhin, I. (2017). Attention is all you need. Advances in Neural Information Processing Systems, 30.",
@@ -990,7 +990,7 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Final_Report_Manik_Bhola.pdf", page_ma
     # ==========================================
     # CHAPTER 10: APPENDICES
     # ==========================================
-    story.append(Paragraph("<b>Chapter 10: Appendices</b>", heading1_style))
+    story.append(Paragraph('<a name="chapter10"/><b>Chapter 10: Appendices</b>', heading1_style))
     story.append(Paragraph("<b>Appendix A: Installation & Setup Guide</b>", heading2_style))
     story.append(Paragraph(
         "To run the CU AI Advisor application locally:<br/>"
