@@ -101,15 +101,15 @@ class PresentationCanvas(canvas.Canvas):
         # Slide 1 & Last Slide (14) are cover pages - no footer
         if self._pageNumber != 1 and self._pageNumber != total_pages:
             # Footer Left Text
-            self.setFont("Times-Bold", 8)
+            self.setFont("Times-Bold", 13)
             self.setFillColor(COLOR_SLATE)
-            self.drawString(25, 30, "CU AI Advisor | Department of Computer Applications")
+            self.drawString(35, 26, "CU AI Advisor | Department of Computer Applications")
             
             # Footer Center Text
-            self.drawCentredString(396, 30, f"Slide {self._pageNumber} of {total_pages}")
+            self.drawCentredString(396, 26, f"Slide {self._pageNumber} of {total_pages}")
             
             # Footer Right Text
-            self.drawRightString(767, 30, "Manik Bhola | O24MCA110817")
+            self.drawRightString(757, 26, "Manik Bhola | O24MCA110817")
             
         self.restoreState()
 
@@ -273,7 +273,7 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Project_Presentation.pdf"):
         slide_flowables.extend(bullet_flowables)
         return slide_flowables
 
-    def make_split_slide(title, bullets, visual_flowable, visual_width=350, caption=""):
+    def make_split_slide(title, bullets, visual_flowable, left_width=310, right_width=390, caption=""):
         # 2-Column slide flowable: text left, drawing/chart/table right
         left_flow = []
         for b in bullets:
@@ -287,7 +287,7 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Project_Presentation.pdf"):
         if caption:
             right_flow.append(Paragraph(caption, style_caption))
             
-        t = Table([[left_flow, right_flow]], colWidths=[310, 390])
+        t = Table([[left_flow, right_flow]], colWidths=[left_width, right_width])
         t.setStyle(TableStyle([
             ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
             ('LEFTPADDING', (0,0), (-1,-1), 0),
@@ -350,7 +350,7 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Project_Presentation.pdf"):
     # ----------------------------------------------------
     # SLIDE 5: System Analysis - DFD 0
     # ----------------------------------------------------
-    dfd0 = scale_drawing(get_dfd_level_0_drawing(), 350)
+    dfd0 = scale_drawing(get_dfd_level_0_drawing(), 440)
     story.extend(make_split_slide(
         "System Analysis: DFD Level 0 Context Diagram",
         [
@@ -360,6 +360,8 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Project_Presentation.pdf"):
             "• <b>Data Boundaries:</b> Shows data boundaries where local rules are analyzed prior to invoking external API services."
         ],
         dfd0,
+        left_width=280,
+        right_width=440,
         caption="Figure 5.1: Context Level Data Flow Diagram"
     ))
     story.append(PageBreak())
@@ -367,7 +369,7 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Project_Presentation.pdf"):
     # ----------------------------------------------------
     # SLIDE 6: System Analysis - DFD 1
     # ----------------------------------------------------
-    dfd1 = scale_drawing(get_dfd_level_1_drawing(), 350)
+    dfd1 = scale_drawing(get_dfd_level_1_drawing(), 440)
     story.extend(make_split_slide(
         "System Analysis: DFD Level 1 Process Flow",
         [
@@ -377,6 +379,8 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Project_Presentation.pdf"):
             "• <b>Data Persistence:</b> Visualizes write operations to appointments database and read queries for analytics graphs."
         ],
         dfd1,
+        left_width=280,
+        right_width=440,
         caption="Figure 6.1: Detailed Process Level Data Flow Diagram"
     ))
     story.append(PageBreak())
@@ -384,8 +388,8 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Project_Presentation.pdf"):
     # ----------------------------------------------------
     # SLIDE 7: System Design - Use Case & Class Diagram
     # ----------------------------------------------------
-    uc_drawing = scale_drawing(get_use_case_drawing(), 350)
-    class_drawing = scale_drawing(get_class_diagram_drawing(), 350)
+    uc_drawing = scale_drawing(get_use_case_drawing(), 420)
+    class_drawing = scale_drawing(get_class_diagram_drawing(), 420)
     
     story.extend(make_split_slide(
         "System Design: UML Use Case & Class Diagram",
@@ -396,6 +400,8 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Project_Presentation.pdf"):
             "• <b>Multi-Compartment Mappings:</b> Outlines attributes and operational methods in complete UML format."
         ],
         [uc_drawing, Spacer(1, 10), class_drawing],
+        left_width=300,
+        right_width=420,
         caption="Figure 7.1: UML Use Case (top) and Class Diagram (bottom)"
     ))
     story.append(PageBreak())
@@ -403,8 +409,8 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Project_Presentation.pdf"):
     # ----------------------------------------------------
     # SLIDE 8: System Design - Sequence & Activity Diagram
     # ----------------------------------------------------
-    seq_drawing = scale_drawing(get_sequence_diagram_drawing(), 350)
-    act_drawing = scale_drawing(get_activity_diagram_drawing(), 350)
+    seq_drawing = scale_drawing(get_sequence_diagram_drawing(), 390)
+    act_drawing = scale_drawing(get_activity_diagram_drawing(), 390)
     
     story.extend(make_split_slide(
         "System Design: Sequence & Activity Diagram",
@@ -415,6 +421,8 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Project_Presentation.pdf"):
             "• <b>Bypass Routing:</b> Employs non-overlapping bypass lines to map output merging into the Logging database."
         ],
         [seq_drawing, Spacer(1, 10), act_drawing],
+        left_width=330,
+        right_width=390,
         caption="Figure 8.1: UML Sequence Flow (top) and Activity Decisions (bottom)"
     ))
     story.append(PageBreak())
@@ -445,7 +453,7 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Project_Presentation.pdf"):
         ["TC-03", "Ask Course", "Regex Match", "Display course info", "PASS"],
         ["TC-04", "Puter AI Drop", "Fallback template", "Assistant card shown", "PASS"]
     ]
-    test_table = Table(test_data, colWidths=[55, 80, 100, 100, 50])
+    test_table = Table(test_data, colWidths=[65, 105, 125, 125, 60])
     test_table.setStyle(TableStyle([
         ('BACKGROUND', (0,0), (-1,0), COLOR_NAVY),
         ('TEXTCOLOR', (0,0), (-1,0), colors.white),
@@ -468,6 +476,8 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Project_Presentation.pdf"):
             "• <b>Test Results:</b> 100% test success rate (23/23 passing) across all database connection and seeding suites."
         ],
         test_table,
+        left_width=240,
+        right_width=480,
         caption="Table 10.1: Core System Test Scenarios"
     ))
     story.append(PageBreak())
@@ -475,8 +485,8 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Project_Presentation.pdf"):
     # ----------------------------------------------------
     # SLIDE 11: Data Analysis & Results
     # ----------------------------------------------------
-    volume_chart = scale_drawing(get_query_volume_chart(), 350)
-    sentiment_chart = scale_drawing(get_sentiment_chart(), 350)
+    volume_chart = scale_drawing(get_query_volume_chart(), 440)
+    sentiment_chart = scale_drawing(get_sentiment_chart(), 440)
     
     story.extend(make_split_slide(
         "Results: Query Analytics & Sentiment Breakdown",
@@ -487,6 +497,8 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Project_Presentation.pdf"):
             "• <b>Operational Impact:</b> Demonstrates system scalability and capability to support university enrollment volumes."
         ],
         [volume_chart, Spacer(1, 10), sentiment_chart],
+        left_width=280,
+        right_width=440,
         caption="Figure 11.1: Query Volume Line Graph (top) and Sentiment Distribution (bottom)"
     ))
     story.append(PageBreak())
