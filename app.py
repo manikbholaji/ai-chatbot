@@ -345,8 +345,43 @@ elif st.session_state.page == "Admin Dashboard":
             
         with c2:
             st.subheader("😊 Sentiment Distribution")
-            fig_sent = px.histogram(df, x='sentiment', nbins=20, 
-                                    template="plotly_white", color_discrete_sequence=['#34A853'])
+            def classify_sentiment(score):
+                if score > 0.05:
+                    return "Positive"
+                elif score < -0.05:
+                    return "Negative"
+                else:
+                    return "Neutral"
+            
+            df['sentiment_category'] = df['sentiment'].apply(classify_sentiment)
+            counts = df['sentiment_category'].value_counts()
+            total = len(df)
+            cats = ["Positive", "Neutral", "Negative"]
+            counts_dict = {cat: counts.get(cat, 0) for cat in cats}
+            pcts = {cat: (counts_dict[cat] / total * 100) if total > 0 else 0.0 for cat in cats}
+            
+            plot_df = pd.DataFrame([
+                {"Sentiment": f"Positive ({pcts['Positive']:.1f}%)", "Percentage": pcts['Positive'], "Category": "Positive"},
+                {"Sentiment": f"Neutral ({pcts['Neutral']:.1f}%)", "Percentage": pcts['Neutral'], "Category": "Neutral"},
+                {"Sentiment": f"Negative ({pcts['Negative']:.1f}%)", "Percentage": pcts['Negative'], "Category": "Negative"}
+            ])
+            
+            fig_sent = px.bar(
+                plot_df, 
+                x='Percentage', 
+                y='Sentiment', 
+                orientation='h',
+                color='Category',
+                color_discrete_map={
+                    'Positive': '#34A853',
+                    'Neutral': '#FBBC05',
+                    'Negative': '#EA4335'
+                },
+                template="plotly_white",
+                range_x=[0, 100],
+                labels={'Percentage': 'Percentage (%)'}
+            )
+            fig_sent.update_layout(showlegend=False, yaxis={'categoryorder':'trace'})
             st.plotly_chart(fig_sent, width="stretch")
             
         st.subheader("📋 Interaction Logs")

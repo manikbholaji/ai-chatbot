@@ -6,3 +6,8 @@ data/appointments.json
 *.db
 data/*.db
 logs.txt
+.streamlit/
+.idea/
+.vscode/
+*.pdf
+!CU_AI_Advisor_MCA_Final_Report_Manik_Bhola.pdf
