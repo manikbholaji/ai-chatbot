@@ -1,4 +1,5 @@
 import os
+from pypdf import PdfReader
 from chapters_data import CHAPTERS_DATA
 from drawings import (
     get_dfd_level_0_drawing,
@@ -20,21 +21,11 @@ from reportlab.pdfgen import canvas
 
 # --- NUMBERED CANVAS WITH RUNNING HEADER & FOOTER ---
 class NumberedCanvas(canvas.Canvas):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self._saved_page_states = []
+    TOTAL_PAGES = 0
 
     def showPage(self):
-        self._saved_page_states.append(dict(self.__dict__))
-        self._startPage()
-
-    def save(self):
-        num_pages = len(self._saved_page_states)
-        for state in self._saved_page_states:
-            self.__dict__.update(state)
-            self.draw_decorations(num_pages)
-            super().showPage()
-        super().save()
+        self.draw_decorations(NumberedCanvas.TOTAL_PAGES)
+        super().showPage()
 
     def draw_decorations(self, page_count):
         self.saveState()
@@ -57,7 +48,10 @@ class NumberedCanvas(canvas.Canvas):
             # Running Footer - Bottom Right Page Number
             self.setFont("Times-Roman", 9)
             self.setFillColor(colors.HexColor("#1A202C"))
-            self.drawRightString(540, 38, f"Page {self._pageNumber} of {page_count}")
+            if page_count > 0:
+                self.drawRightString(540, 38, f"Page {self._pageNumber} of {page_count}")
+            else:
+                self.drawRightString(540, 38, f"Page {self._pageNumber}")
             
             # Left Running Footer
             self.drawString(72, 38, "Chandigarh University | Master of Computer Applications (MCA) Project Report")
@@ -1143,28 +1137,38 @@ def scan_pdf_page_mappings(pdf_path):
     return mappings
 
 def build_pdf_multipass(filename="CU_AI_Advisor_MCA_Final_Report_Manik_Bhola.pdf"):
+    # Clear total pages for Pass 1
+    NumberedCanvas.TOTAL_PAGES = 0
     print("Pass 1: Building PDF with guess page numbers...")
     build_pdf(filename, page_mappings=None)
     
     print("Pass 1 complete. Scanning PDF for true page alignments...")
+    reader = PdfReader(filename)
+    total_pages = len(reader.pages)
     mappings = scan_pdf_page_mappings(filename)
     print("Scanned Alignments:")
     for k, v in mappings.items():
         print(f"  {k}: {v}")
         
-    print("\nPass 2: Re-building PDF with exact page alignments...")
+    print(f"\nPass 2: Re-building PDF with exact page alignments (Total Pages: {total_pages})...")
+    NumberedCanvas.TOTAL_PAGES = total_pages
     build_pdf(filename, page_mappings=mappings)
     
     print("Pass 2 complete. Re-scanning PDF to check for any layout shift...")
+    reader2 = PdfReader(filename)
+    new_total_pages = len(reader2.pages)
     new_mappings = scan_pdf_page_mappings(filename)
     
-    # Check if the page numbers changed (which can happen if the TOC size shifts)
+    # Check if the page numbers changed
     shifts = {k: (v, new_mappings.get(k)) for k, v in mappings.items() if new_mappings.get(k) != v}
-    if shifts:
+    if shifts or new_total_pages != total_pages:
         print("Layout shift detected:")
+        if new_total_pages != total_pages:
+            print(f"  Total Pages: {total_pages} -> {new_total_pages}")
         for k, (v1, v2) in shifts.items():
             print(f"  {k}: {v1} -> {v2}")
         print("\nPass 3: Running third compilation to ensure convergence...")
+        NumberedCanvas.TOTAL_PAGES = new_total_pages
         build_pdf(filename, page_mappings=new_mappings)
         print("Pass 3 complete. Convergence achieved!")
     else:
