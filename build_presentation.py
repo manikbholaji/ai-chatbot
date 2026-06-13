@@ -140,8 +140,8 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Project_Presentation.pdf"):
     style_cover_title = ParagraphStyle(
         'CoverTitle',
         fontName='Times-Bold',
-        fontSize=26,
-        leading=30,
+        fontSize=32,
+        leading=38,
         alignment=TA_CENTER,
         textColor=colors.white,
         spaceAfter=15
@@ -150,8 +150,8 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Project_Presentation.pdf"):
     style_cover_subtitle = ParagraphStyle(
         'CoverSubtitle',
         fontName='Times-Roman',
-        fontSize=13,
-        leading=16,
+        fontSize=16,
+        leading=20,
         alignment=TA_CENTER,
         textColor=COLOR_BORDER,
         spaceAfter=30
@@ -160,8 +160,8 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Project_Presentation.pdf"):
     style_cover_label = ParagraphStyle(
         'CoverLabel',
         fontName='Times-Bold',
-        fontSize=12,
-        leading=15,
+        fontSize=14,
+        leading=17,
         textColor=COLOR_GOLD,
         spaceAfter=5
     )
@@ -169,8 +169,8 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Project_Presentation.pdf"):
     style_cover_val = ParagraphStyle(
         'CoverValue',
         fontName='Times-Roman',
-        fontSize=11,
-        leading=14,
+        fontSize=13,
+        leading=16,
         textColor=colors.white,
         spaceAfter=15
     )
@@ -178,8 +178,8 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Project_Presentation.pdf"):
     style_cover_date = ParagraphStyle(
         'CoverDate',
         fontName='Times-Bold',
-        fontSize=11,
-        leading=14,
+        fontSize=13,
+        leading=16,
         alignment=TA_CENTER,
         textColor=COLOR_GOLD,
         spaceBefore=25
@@ -188,8 +188,8 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Project_Presentation.pdf"):
     style_slide_title = ParagraphStyle(
         'SlideTitle',
         fontName='Times-Bold',
-        fontSize=20,
-        leading=24,
+        fontSize=24,
+        leading=28,
         textColor=colors.white,
         spaceAfter=15
     )
@@ -197,19 +197,19 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Project_Presentation.pdf"):
     style_bullet = ParagraphStyle(
         'SlideBullet',
         fontName='Times-Roman',
-        fontSize=13,
-        leading=18,
+        fontSize=16,
+        leading=22,
         textColor=COLOR_TEXT_DARK,
         leftIndent=15,
         firstLineIndent=-12,
-        spaceAfter=10
+        spaceAfter=12
     )
     
     style_caption = ParagraphStyle(
         'SlideCaption',
         fontName='Times-Italic',
-        fontSize=8.5,
-        leading=11,
+        fontSize=11,
+        leading=14,
         alignment=TA_CENTER,
         textColor=COLOR_SLATE,
         spaceBefore=10
@@ -273,7 +273,7 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Project_Presentation.pdf"):
         slide_flowables.extend(bullet_flowables)
         return slide_flowables
 
-    def make_split_slide(title, bullets, visual_flowable, visual_width=320, caption=""):
+    def make_split_slide(title, bullets, visual_flowable, visual_width=370, caption=""):
         # 2-Column slide flowable: text left, drawing/chart/table right
         left_flow = []
         for b in bullets:
@@ -283,7 +283,7 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Project_Presentation.pdf"):
         if caption:
             right_flow.append(Paragraph(caption, style_caption))
             
-        t = Table([[left_flow, right_flow]], colWidths=[360, 340])
+        t = Table([[left_flow, right_flow]], colWidths=[310, 390])
         t.setStyle(TableStyle([
             ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
             ('LEFTPADDING', (0,0), (-1,-1), 0),
@@ -346,7 +346,7 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Project_Presentation.pdf"):
     # ----------------------------------------------------
     # SLIDE 5: System Analysis - DFD 0
     # ----------------------------------------------------
-    dfd0 = scale_drawing(get_dfd_level_0_drawing(), 320)
+    dfd0 = scale_drawing(get_dfd_level_0_drawing(), 370)
     story.extend(make_split_slide(
         "System Analysis: DFD Level 0 Context Diagram",
         [
@@ -363,7 +363,7 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Project_Presentation.pdf"):
     # ----------------------------------------------------
     # SLIDE 6: System Analysis - DFD 1
     # ----------------------------------------------------
-    dfd1 = scale_drawing(get_dfd_level_1_drawing(), 320)
+    dfd1 = scale_drawing(get_dfd_level_1_drawing(), 370)
     story.extend(make_split_slide(
         "System Analysis: DFD Level 1 Process Flow",
         [
@@ -380,10 +380,10 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Project_Presentation.pdf"):
     # ----------------------------------------------------
     # SLIDE 7: System Design - Use Case & Class Diagram
     # ----------------------------------------------------
-    uc_drawing = scale_drawing(get_use_case_drawing(), 160)
-    class_drawing = scale_drawing(get_class_diagram_drawing(), 160)
+    uc_drawing = scale_drawing(get_use_case_drawing(), 180)
+    class_drawing = scale_drawing(get_class_diagram_drawing(), 180)
     # Combine side-by-side inside a table
-    uml_table = Table([[uc_drawing, class_drawing]], colWidths=[165, 165])
+    uml_table = Table([[uc_drawing, class_drawing]], colWidths=[185, 185])
     uml_table.setStyle(TableStyle([
         ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
         ('LEFTPADDING', (0,0), (-1,-1), 0),
@@ -406,9 +406,9 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Project_Presentation.pdf"):
     # ----------------------------------------------------
     # SLIDE 8: System Design - Sequence & Activity Diagram
     # ----------------------------------------------------
-    seq_drawing = scale_drawing(get_sequence_diagram_drawing(), 160)
-    act_drawing = scale_drawing(get_activity_diagram_drawing(), 160)
-    uml_table2 = Table([[seq_drawing, act_drawing]], colWidths=[165, 165])
+    seq_drawing = scale_drawing(get_sequence_diagram_drawing(), 180)
+    act_drawing = scale_drawing(get_activity_diagram_drawing(), 180)
+    uml_table2 = Table([[seq_drawing, act_drawing]], colWidths=[185, 185])
     uml_table2.setStyle(TableStyle([
         ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
         ('LEFTPADDING', (0,0), (-1,-1), 0),
@@ -454,18 +454,18 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Project_Presentation.pdf"):
         ["TC-03", "Ask Course", "Regex Match", "Display course info", "PASS"],
         ["TC-04", "Puter AI Drop", "Fallback template", "Assistant card shown", "PASS"]
     ]
-    test_table = Table(test_data, colWidths=[50, 75, 90, 90, 45])
+    test_table = Table(test_data, colWidths=[55, 80, 100, 100, 50])
     test_table.setStyle(TableStyle([
         ('BACKGROUND', (0,0), (-1,0), COLOR_NAVY),
         ('TEXTCOLOR', (0,0), (-1,0), colors.white),
         ('FONTNAME', (0,0), (-1,0), 'Times-Bold'),
-        ('FONTSIZE', (0,0), (-1,-1), 8),
+        ('FONTSIZE', (0,0), (-1,-1), 10),
         ('ALIGN', (0,0), (-1,-1), 'CENTER'),
         ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
         ('GRID', (0,0), (-1,-1), 0.5, COLOR_BORDER),
         ('ROWBACKGROUNDS', (0,1), (-1,-1), [colors.white, COLOR_BG_LIGHT]),
-        ('TOPPADDING', (0,0), (-1,-1), 4),
-        ('BOTTOMPADDING', (0,0), (-1,-1), 4),
+        ('TOPPADDING', (0,0), (-1,-1), 6),
+        ('BOTTOMPADDING', (0,0), (-1,-1), 6),
     ]))
 
     story.extend(make_split_slide(
@@ -484,9 +484,9 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Project_Presentation.pdf"):
     # ----------------------------------------------------
     # SLIDE 11: Data Analysis & Results
     # ----------------------------------------------------
-    volume_chart = scale_drawing(get_query_volume_chart(), 160)
-    sentiment_chart = scale_drawing(get_sentiment_chart(), 160)
-    results_table = Table([[volume_chart, sentiment_chart]], colWidths=[165, 165])
+    volume_chart = scale_drawing(get_query_volume_chart(), 180)
+    sentiment_chart = scale_drawing(get_sentiment_chart(), 180)
+    results_table = Table([[volume_chart, sentiment_chart]], colWidths=[185, 185])
     results_table.setStyle(TableStyle([
         ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
         ('LEFTPADDING', (0,0), (-1,-1), 0),
