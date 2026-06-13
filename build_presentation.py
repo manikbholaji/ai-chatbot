@@ -273,13 +273,17 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Project_Presentation.pdf"):
         slide_flowables.extend(bullet_flowables)
         return slide_flowables
 
-    def make_split_slide(title, bullets, visual_flowable, visual_width=370, caption=""):
+    def make_split_slide(title, bullets, visual_flowable, visual_width=350, caption=""):
         # 2-Column slide flowable: text left, drawing/chart/table right
         left_flow = []
         for b in bullets:
             left_flow.append(Paragraph(b, style_bullet))
             
-        right_flow = [visual_flowable]
+        if isinstance(visual_flowable, list):
+            right_flow = list(visual_flowable)
+        else:
+            right_flow = [visual_flowable]
+            
         if caption:
             right_flow.append(Paragraph(caption, style_caption))
             
@@ -346,7 +350,7 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Project_Presentation.pdf"):
     # ----------------------------------------------------
     # SLIDE 5: System Analysis - DFD 0
     # ----------------------------------------------------
-    dfd0 = scale_drawing(get_dfd_level_0_drawing(), 370)
+    dfd0 = scale_drawing(get_dfd_level_0_drawing(), 350)
     story.extend(make_split_slide(
         "System Analysis: DFD Level 0 Context Diagram",
         [
@@ -363,7 +367,7 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Project_Presentation.pdf"):
     # ----------------------------------------------------
     # SLIDE 6: System Analysis - DFD 1
     # ----------------------------------------------------
-    dfd1 = scale_drawing(get_dfd_level_1_drawing(), 370)
+    dfd1 = scale_drawing(get_dfd_level_1_drawing(), 350)
     story.extend(make_split_slide(
         "System Analysis: DFD Level 1 Process Flow",
         [
@@ -380,15 +384,8 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Project_Presentation.pdf"):
     # ----------------------------------------------------
     # SLIDE 7: System Design - Use Case & Class Diagram
     # ----------------------------------------------------
-    uc_drawing = scale_drawing(get_use_case_drawing(), 180)
-    class_drawing = scale_drawing(get_class_diagram_drawing(), 180)
-    # Combine side-by-side inside a table
-    uml_table = Table([[uc_drawing, class_drawing]], colWidths=[185, 185])
-    uml_table.setStyle(TableStyle([
-        ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
-        ('LEFTPADDING', (0,0), (-1,-1), 0),
-        ('RIGHTPADDING', (0,0), (-1,-1), 0),
-    ]))
+    uc_drawing = scale_drawing(get_use_case_drawing(), 350)
+    class_drawing = scale_drawing(get_class_diagram_drawing(), 350)
     
     story.extend(make_split_slide(
         "System Design: UML Use Case & Class Diagram",
@@ -398,22 +395,16 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Project_Presentation.pdf"):
             "• <b>Object Relationships:</b> Enforces dependency injection where `ChatController` uses `DatabaseManager` for session transactions.",
             "• <b>Multi-Compartment Mappings:</b> Outlines attributes and operational methods in complete UML format."
         ],
-        uml_table,
-        caption="Figure 7.1: UML Use Case (left) and Class Diagram (right)"
+        [uc_drawing, Spacer(1, 10), class_drawing],
+        caption="Figure 7.1: UML Use Case (top) and Class Diagram (bottom)"
     ))
     story.append(PageBreak())
 
     # ----------------------------------------------------
     # SLIDE 8: System Design - Sequence & Activity Diagram
     # ----------------------------------------------------
-    seq_drawing = scale_drawing(get_sequence_diagram_drawing(), 180)
-    act_drawing = scale_drawing(get_activity_diagram_drawing(), 180)
-    uml_table2 = Table([[seq_drawing, act_drawing]], colWidths=[185, 185])
-    uml_table2.setStyle(TableStyle([
-        ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
-        ('LEFTPADDING', (0,0), (-1,-1), 0),
-        ('RIGHTPADDING', (0,0), (-1,-1), 0),
-    ]))
+    seq_drawing = scale_drawing(get_sequence_diagram_drawing(), 350)
+    act_drawing = scale_drawing(get_activity_diagram_drawing(), 350)
     
     story.extend(make_split_slide(
         "System Design: Sequence & Activity Diagram",
@@ -423,8 +414,8 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Project_Presentation.pdf"):
             "• <b>Decision Lifecycles:</b> Activity diagram maps the routing logic for matching local catalogs before fallback.",
             "• <b>Bypass Routing:</b> Employs non-overlapping bypass lines to map output merging into the Logging database."
         ],
-        uml_table2,
-        caption="Figure 8.1: UML Sequence Flow (left) and Activity Decisions (right)"
+        [seq_drawing, Spacer(1, 10), act_drawing],
+        caption="Figure 8.1: UML Sequence Flow (top) and Activity Decisions (bottom)"
     ))
     story.append(PageBreak())
 
@@ -484,14 +475,8 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Project_Presentation.pdf"):
     # ----------------------------------------------------
     # SLIDE 11: Data Analysis & Results
     # ----------------------------------------------------
-    volume_chart = scale_drawing(get_query_volume_chart(), 180)
-    sentiment_chart = scale_drawing(get_sentiment_chart(), 180)
-    results_table = Table([[volume_chart, sentiment_chart]], colWidths=[185, 185])
-    results_table.setStyle(TableStyle([
-        ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
-        ('LEFTPADDING', (0,0), (-1,-1), 0),
-        ('RIGHTPADDING', (0,0), (-1,-1), 0),
-    ]))
+    volume_chart = scale_drawing(get_query_volume_chart(), 350)
+    sentiment_chart = scale_drawing(get_sentiment_chart(), 350)
     
     story.extend(make_split_slide(
         "Results: Query Analytics & Sentiment Breakdown",
@@ -501,8 +486,8 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Project_Presentation.pdf"):
             "• <b>Dashboard Integration:</b> Admin analytics display Plotly line charts and breakdowns dynamically.",
             "• <b>Operational Impact:</b> Demonstrates system scalability and capability to support university enrollment volumes."
         ],
-        results_table,
-        caption="Figure 11.1: Query Volume Line Graph (left) and Sentiment Distribution (right)"
+        [volume_chart, Spacer(1, 10), sentiment_chart],
+        caption="Figure 11.1: Query Volume Line Graph (top) and Sentiment Distribution (bottom)"
     ))
     story.append(PageBreak())
 
