@@ -1,7 +1,5 @@
 import os
-import sys
-import re
-from pathlib import Path
+from chapters_data import CHAPTERS_DATA
 from drawings import (
     get_dfd_level_0_drawing,
     get_dfd_level_1_drawing,
@@ -17,7 +15,7 @@ from reportlab.lib.pagesizes import letter
 from reportlab.lib import colors
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, PageBreak, KeepTogether, Preformatted, Image
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.lib.enums import TA_JUSTIFY, TA_CENTER, TA_LEFT, TA_RIGHT
+from reportlab.lib.enums import TA_JUSTIFY, TA_CENTER, TA_LEFT
 from reportlab.pdfgen import canvas
 
 # --- NUMBERED CANVAS WITH RUNNING HEADER & FOOTER ---
@@ -69,7 +67,6 @@ class NumberedCanvas(canvas.Canvas):
         self.restoreState()
 
 # --- IMPORT DETAILED TEXT DATA SET ---
-from chapters_data import CHAPTERS_DATA
 
 def wrap_code_text(text, max_len=85):
     lines = []
@@ -213,18 +210,6 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Final_Report_Manik_Bhola.pdf", page_ma
         spaceAfter=12
     )
 
-    diagram_style = ParagraphStyle(
-        'DiagramBlock',
-        fontName='Courier',
-        fontSize=8.0,
-        leading=10.0,
-        textColor=colors.HexColor("#1A202C"),
-        backColor=colors.HexColor("#F8FAFC"),
-        borderColor=colors.HexColor("#CBD5E1"),
-        borderWidth=0.5,
-        borderPadding=8,
-        spaceAfter=12
-    )
 
     def wrap_image(img_path, width, height):
         img = Image(img_path, width=width, height=height)
@@ -599,14 +584,14 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Final_Report_Manik_Bhola.pdf", page_ma
                 story.append(Spacer(1, 6))
                 story.append(get_dfd_level_0_drawing())
                 story.append(Spacer(1, 6))
-                story.append(Paragraph(f"<i>Figure 3.1: DFD Level 0 Context Diagram</i>", body_center_style))
+                story.append(Paragraph("<i>Figure 3.1: DFD Level 0 Context Diagram</i>", body_center_style))
                 
                 story.append(Spacer(1, 10))
                 story.append(Paragraph('<a name="fig_3_2"/><b>Figure 3.2: DFD Level 1 System Data Flow Diagram</b>', body_bold_style))
                 story.append(Spacer(1, 6))
                 story.append(get_dfd_level_1_drawing())
                 story.append(Spacer(1, 6))
-                story.append(Paragraph(f"<i>Figure 3.2: DFD Level 1 System Data Flow Diagram</i>", body_center_style))
+                story.append(Paragraph("<i>Figure 3.2: DFD Level 1 System Data Flow Diagram</i>", body_center_style))
                 story.append(Spacer(1, 15))
                 
             elif sec_title == "3.1 Requirements Specification":
@@ -635,7 +620,7 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Final_Report_Manik_Bhola.pdf", page_ma
                 ]))
                 story.append(t_req)
                 story.append(Spacer(1, 10))
-                story.append(Paragraph(f"<i>Table 3.1: Minimum System Hardware and Software Requirements Specifications</i>", body_center_style))
+                story.append(Paragraph("<i>Table 3.1: Minimum System Hardware and Software Requirements Specifications</i>", body_center_style))
                 story.append(Spacer(1, 15))
                 
             elif sec_title == "2.2 Comparative Analysis of Technologies":
@@ -665,7 +650,7 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Final_Report_Manik_Bhola.pdf", page_ma
                 ]))
                 story.append(t_comp)
                 story.append(Spacer(1, 12))
-                story.append(Paragraph(f"<i>Table 2.1: Comparative Analysis of Student Advising Architectures</i>", body_center_style))
+                story.append(Paragraph("<i>Table 2.1: Comparative Analysis of Student Advising Architectures</i>", body_center_style))
                 story.append(Spacer(1, 15))
                 
             elif sec_title == "4.1 Database Design & Schema":
@@ -695,7 +680,7 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Final_Report_Manik_Bhola.pdf", page_ma
                 ]))
                 story.append(t_db_map)
                 story.append(Spacer(1, 12))
-                story.append(Paragraph(f"<i>Table 4.1: Primary Database Entity Schema Mappings</i>", body_center_style))
+                story.append(Paragraph("<i>Table 4.1: Primary Database Entity Schema Mappings</i>", body_center_style))
                 story.append(Spacer(1, 15))
 
                 # Also append secondary table schemas in detail:
@@ -770,35 +755,35 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Final_Report_Manik_Bhola.pdf", page_ma
                 story.append(Spacer(1, 6))
                 story.append(get_use_case_drawing())
                 story.append(Spacer(1, 6))
-                story.append(Paragraph(f"<i>Figure 4.1: Unified Modeling Language (UML) Use Case Diagram</i>", body_center_style))
+                story.append(Paragraph("<i>Figure 4.1: Unified Modeling Language (UML) Use Case Diagram</i>", body_center_style))
                 
                 story.append(Spacer(1, 10))
                 story.append(Paragraph('<a name="fig_4_2"/><b>Figure 4.2: Database Entity-Relationship Diagram (3NF Schema)</b>', body_bold_style))
                 story.append(Spacer(1, 6))
                 story.append(get_er_diagram_drawing())
                 story.append(Spacer(1, 6))
-                story.append(Paragraph(f"<i>Figure 4.2: Database Entity-Relationship Diagram (3NF Schema)</i>", body_center_style))
+                story.append(Paragraph("<i>Figure 4.2: Database Entity-Relationship Diagram (3NF Schema)</i>", body_center_style))
                 
                 story.append(Spacer(1, 10))
                 story.append(Paragraph('<a name="fig_4_3"/><b>Figure 4.3: UML Class Interaction Diagram</b>', body_bold_style))
                 story.append(Spacer(1, 6))
                 story.append(get_class_diagram_drawing())
                 story.append(Spacer(1, 6))
-                story.append(Paragraph(f"<i>Figure 4.3: UML Class Interaction Diagram</i>", body_center_style))
+                story.append(Paragraph("<i>Figure 4.3: UML Class Interaction Diagram</i>", body_center_style))
                 
                 story.append(Spacer(1, 10))
                 story.append(Paragraph('<a name="fig_4_4"/><b>Figure 4.4: Sequence Diagram for Chat Resolution Flow</b>', body_bold_style))
                 story.append(Spacer(1, 6))
                 story.append(get_sequence_diagram_drawing())
                 story.append(Spacer(1, 6))
-                story.append(Paragraph(f"<i>Figure 4.4: Sequence Diagram for Chat Resolution Flow</i>", body_center_style))
+                story.append(Paragraph("<i>Figure 4.4: Sequence Diagram for Chat Resolution Flow</i>", body_center_style))
                 
                 story.append(Spacer(1, 10))
                 story.append(Paragraph('<a name="fig_4_5"/><b>Figure 4.5: System Activity Logic Lifecycle Diagram</b>', body_bold_style))
                 story.append(Spacer(1, 6))
                 story.append(get_activity_diagram_drawing())
                 story.append(Spacer(1, 6))
-                story.append(Paragraph(f"<i>Figure 4.5: System Activity Logic Lifecycle Diagram</i>", body_center_style))
+                story.append(Paragraph("<i>Figure 4.5: System Activity Logic Lifecycle Diagram</i>", body_center_style))
                 story.append(Spacer(1, 15))
 
             elif sec_title == "5.5 Application Screenshots & Explanations":
@@ -900,7 +885,7 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Final_Report_Manik_Bhola.pdf", page_ma
                 ]))
                 story.append(t_t1)
                 story.append(Spacer(1, 10))
-                story.append(Paragraph(f"<i>Table 6.1: Unit Verification Test Suite Case Matrix</i>", body_center_style))
+                story.append(Paragraph("<i>Table 6.1: Unit Verification Test Suite Case Matrix</i>", body_center_style))
                 story.append(Spacer(1, 15))
                 
             elif sec_title == "6.3 End-to-End (E2E) Test Suite":
@@ -930,7 +915,7 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Final_Report_Manik_Bhola.pdf", page_ma
                 ]))
                 story.append(t_t2)
                 story.append(Spacer(1, 10))
-                story.append(Paragraph(f"<i>Table 6.2: System Integration and E2E Test Case Matrix</i>", body_center_style))
+                story.append(Paragraph("<i>Table 6.2: System Integration and E2E Test Case Matrix</i>", body_center_style))
                 story.append(Spacer(1, 15))
                 
             elif sec_title == "7.2 Sentiment and Analytics Insights":
@@ -939,14 +924,14 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Final_Report_Manik_Bhola.pdf", page_ma
                 story.append(Spacer(1, 6))
                 story.append(get_query_volume_chart())
                 story.append(Spacer(1, 6))
-                story.append(Paragraph(f"<i>Figure 7.1: Query Volume Over Time Graph</i>", body_center_style))
+                story.append(Paragraph("<i>Figure 7.1: Query Volume Over Time Graph</i>", body_center_style))
                 
                 story.append(Spacer(1, 10))
                 story.append(Paragraph('<a name="fig_7_2"/><b>Figure 7.2: Sentiment Distribution Graph</b>', body_bold_style))
                 story.append(Spacer(1, 6))
                 story.append(get_sentiment_chart())
                 story.append(Spacer(1, 6))
-                story.append(Paragraph(f"<i>Figure 7.2: Sentiment Distribution Graph</i>", body_center_style))
+                story.append(Paragraph("<i>Figure 7.2: Sentiment Distribution Graph</i>", body_center_style))
                 story.append(Spacer(1, 15))
                 
         story.append(PageBreak())

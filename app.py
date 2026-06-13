@@ -775,8 +775,10 @@ elif st.session_state.page == "Admin Dashboard":
                 ]
             
             def make_badge(s):
-                if s > 0.1: return "🟢 Positive"
-                elif s < -0.1: return "🔴 Negative"
+                if s > 0.1:
+                    return "🟢 Positive"
+                if s < -0.1:
+                    return "🔴 Negative"
                 return "🟡 Neutral"
             df_table['Sentiment Badge'] = df_table['sentiment'].apply(make_badge)
             
@@ -962,7 +964,7 @@ elif st.session_state.page == "Appointment Management":
                             if st.button("❌ Cancel", key=f"cancel_admin_appt_{row['student_name']}_{row['date']}_{row['time']}", use_container_width=True):
                                 success = delete_appointment_db(row['student_name'], row['date'], row['time'])
                                 if success:
-                                    st.success(f"Cancelled session!")
+                                    st.success("Cancelled session!")
                                     st.rerun()
                                 else:
                                     st.error("Failed to delete.")
