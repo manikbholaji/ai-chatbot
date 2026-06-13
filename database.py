@@ -245,7 +245,9 @@ def init_db():
             Policy(topic="Attendance", description="Students must maintain 75% attendance to be eligible for final examinations."),
             Policy(topic="Grading", description="Evaluation is based on a CGPA system with internal assessments and end-term exams."),
             Policy(topic="Admissions", description="Admissions are based on merit and CU-CET entrance examination results."),
-            Policy(topic="Appointments", description="Academic advising is available Mon-Fri, 9 AM to 5 PM via the online portal.")
+            Policy(topic="Appointments", description="Academic advising is available Mon-Fri, 9 AM to 5 PM via the online portal."),
+            Policy(topic="Syllabus", description="The curriculum and syllabus are subject to periodic review by the Board of Studies to align with industry trends."),
+            Policy(topic="Plagiarism", description="Academic honesty is strictly enforced. Any form of plagiarism in assignments or reports will result in disciplinary action.")
         ]
         
         for p in default_policies:
