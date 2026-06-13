@@ -1024,7 +1024,7 @@ def build_pdf(filename="CU_AI_Advisor_MCA_Final_Report_Manik_Bhola.pdf", page_ma
         try:
             with open(filename, "r", encoding="utf-8") as f:
                 code_text = f.read()
-            wrapped_code = wrap_code_text(code_text, max_len=135)
+            wrapped_code = wrap_code_text(code_text, max_len=100)
             # Escape HTML entities
             escaped_code = wrapped_code.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
             story.append(Preformatted(escaped_code, code_style))
